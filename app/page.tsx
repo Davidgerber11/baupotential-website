@@ -1,8 +1,10 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen flex items-center justify-center bg-white text-black">
       <div className="max-w-xl text-center space-y-6">
-        
+
         <h1 className="text-4xl font-semibold">
           Baupotential für Ihr Grundstück
         </h1>
@@ -11,12 +13,12 @@ export default function Home() {
           Erhalten Sie eine erste Einschätzung zur bebaubaren Fläche Ihres Grundstücks – schnell und einfach.
         </p>
 
-        <a
+        <Link
           href="/order"
           className="inline-block bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition"
         >
           Grundstück prüfen lassen
-        </a>
+        </Link>
 
       </div>
     </main>

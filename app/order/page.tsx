@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { supabase } from "@/lib/supabase";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -16,6 +17,8 @@ type ParcelInfo = {
   number: string;
   municipality: string;
   area: string;
+  lon: number;
+  lat: number;
   raw: any;
 };
 
@@ -26,8 +29,14 @@ export default function OrderPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [parcelInfo, setParcelInfo] = useState<ParcelInfo | null>(null);
+
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+
   const [isSearching, setIsSearching] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const [message, setMessage] = useState(
     "Suchen Sie eine Adresse oder klicken Sie direkt auf eine Parzelle."
   );
@@ -166,10 +175,15 @@ export default function OrderPage() {
           attrs.flaeche || attrs.area || attrs.liegenschaft_flaeche
             ? `${attrs.flaeche || attrs.area || attrs.liegenschaft_flaeche} m²`
             : "—",
-        raw: attrs,
+        lon,
+        lat,
+        raw: {
+          ...attrs,
+          geometry: parcel.geometry,
+        },
       });
 
-      setMessage("Parzelle gefunden. Bitte bestätigen Sie die Auswahl.");
+      setMessage("Parzelle gefunden. Bitte Kontaktdaten ergänzen.");
     } catch (error) {
       console.error(error);
       setParcelInfo(null);
@@ -245,8 +259,9 @@ export default function OrderPage() {
   async function selectSearchResult(result: any) {
     const lon = result.attrs.lon;
     const lat = result.attrs.lat;
+    const label = result.attrs.label.replace(/<[^>]*>/g, "");
 
-    setQuery(result.attrs.label.replace(/<[^>]*>/g, ""));
+    setQuery(label);
     setResults([]);
 
     mapRef.current?.flyTo({
@@ -256,6 +271,64 @@ export default function OrderPage() {
     });
 
     await identifyParcel(lon, lat);
+  }
+
+  async function saveOrder() {
+    if (!parcelInfo) {
+      alert("Bitte zuerst ein Grundstück auswählen.");
+      return;
+    }
+
+    if (!customerName.trim() || !customerEmail.trim()) {
+      alert("Bitte Name und E-Mail ausfüllen.");
+      return;
+    }
+
+    setIsSaving(true);
+
+ const { error } = await supabase.from("orders").insert({
+  name: customerName,
+  email: customerEmail,
+  address: query || null,
+  parcel_number: parcelInfo.number,
+  municipality: parcelInfo.municipality,
+  area: parcelInfo.area,
+  longitude: parcelInfo.lon,
+  latitude: parcelInfo.lat,
+  raw_data: parcelInfo.raw,
+});
+
+if (error) {
+  console.error(error);
+  alert("Fehler beim Speichern");
+  return;
+}
+
+await fetch("/api/send", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    email: customerEmail,
+    name: customerName,
+    parcel: parcelInfo.number,
+  }),
+});
+
+    setIsSaving(false);
+
+    if (error) {
+      console.error(error);
+      alert("Fehler beim Speichern: " + error.message);
+      return;
+    }
+
+    alert("Gespeichert! Wir melden uns per E-Mail.");
+    resetSelection();
+    setCustomerName("");
+    setCustomerEmail("");
+    setQuery("");
   }
 
   function resetSelection() {
@@ -283,7 +356,7 @@ export default function OrderPage() {
           </p>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[360px_1fr]">
+        <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
           <aside className="h-fit rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
             <label className="text-sm font-semibold text-neutral-900">
               Adresse oder Parzelle
@@ -341,6 +414,33 @@ export default function OrderPage() {
                   </p>
                 </div>
 
+                <div className="mt-5 space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-neutral-900">
+                      Name
+                    </label>
+                    <input
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
+                      placeholder="Ihr Name"
+                      className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-3 text-neutral-950 placeholder:text-neutral-400 focus:border-black focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-neutral-900">
+                      E-Mail
+                    </label>
+                    <input
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      placeholder="ihre@email.ch"
+                      type="email"
+                      className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-3 text-neutral-950 placeholder:text-neutral-400 focus:border-black focus:outline-none"
+                    />
+                  </div>
+                </div>
+
                 <details className="mt-4 text-xs text-neutral-600">
                   <summary className="cursor-pointer">
                     Technische Daten anzeigen
@@ -351,8 +451,12 @@ export default function OrderPage() {
                 </details>
 
                 <div className="mt-6 space-y-2">
-                  <button className="w-full rounded-xl bg-black py-3 font-medium text-white transition hover:bg-neutral-800">
-                    Ja, das ist mein Grundstück
+                  <button
+                    onClick={saveOrder}
+                    disabled={isSaving}
+                    className="w-full rounded-xl bg-black py-3 font-medium text-white transition hover:bg-neutral-800 disabled:opacity-50"
+                  >
+                    {isSaving ? "Speichern..." : "Daten speichern"}
                   </button>
 
                   <button

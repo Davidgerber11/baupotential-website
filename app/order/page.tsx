@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/lib/supabase";
@@ -38,7 +39,7 @@ export default function OrderPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [message, setMessage] = useState(
-    "Suchen Sie eine Adresse oder klicken Sie direkt auf eine Parzelle."
+    "Adresse oder Parzelle suchen oder direkt auf die Karte klicken."
   );
 
   useEffect(() => {
@@ -48,29 +49,31 @@ export default function OrderPage() {
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
       center: [7.4474, 46.9481],
-      zoom: 16,
+      zoom: 15.5,
       maxZoom: 20,
     });
 
     mapRef.current = map;
 
-    map.addControl(new mapboxgl.NavigationControl(), "top-right");
+    map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
 
     map.on("load", () => {
       map.addSource("official-parcels", {
-        type: "raster",
-        tiles: [
-          "https://wms.geo.admin.ch/?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=ch.kantone.cadastralwebmap-farbe&STYLES=&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512&FORMAT=image/png&TRANSPARENT=true",
-        ],
-        tileSize: 512,
-      });
+      type: "raster",
+      tiles: [
+        "https://wmts.geo.admin.ch/1.0.0/ch.kantone.cadastralwebmap-farbe/default/current/3857/{z}/{x}/{y}.png",
+      ],
+      tileSize: 512,
+      minzoom: 14,
+      maxzoom: 20,
+    });
 
       map.addLayer({
         id: "official-parcels-layer",
         type: "raster",
         source: "official-parcels",
         paint: {
-          "raster-opacity": 0.78,
+          "raster-opacity": 0.75,
           "raster-fade-duration": 0,
         },
       });
@@ -111,7 +114,7 @@ export default function OrderPage() {
       if (foundResults.length === 0) {
         setMessage("Keine Adresse oder Parzelle gefunden.");
       } else {
-        setMessage("Wählen Sie einen Treffer aus der Liste.");
+        setMessage("Wählen Sie einen Treffer aus.");
       }
     } catch (error) {
       console.error(error);
@@ -138,8 +141,7 @@ export default function OrderPage() {
         limit: "1",
       });
 
-      const url =
-        `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?${params.toString()}`;
+      const url = `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?${params.toString()}`;
 
       const res = await fetch(url);
       const data = await res.json();
@@ -183,7 +185,8 @@ export default function OrderPage() {
         },
       });
 
-      setMessage("Parzelle gefunden. Bitte Kontaktdaten ergänzen.");
+      setResults([]);
+      setMessage("Parzelle gefunden. Kontaktdaten ergänzen.");
     } catch (error) {
       console.error(error);
       setParcelInfo(null);
@@ -215,7 +218,7 @@ export default function OrderPage() {
       type: "fill",
       source: "parcel",
       paint: {
-        "fill-color": "#22c55e",
+        "fill-color": "#c6a46b",
         "fill-opacity": 0.35,
       },
     });
@@ -225,7 +228,7 @@ export default function OrderPage() {
       type: "line",
       source: "parcel",
       paint: {
-        "line-color": "#047857",
+        "line-color": "#9b7540",
         "line-width": 4,
       },
     });
@@ -249,7 +252,7 @@ export default function OrderPage() {
 
     if (!bounds.isEmpty()) {
       map.fitBounds(bounds, {
-        padding: 80,
+        padding: 120,
         maxZoom: 18,
         duration: 700,
       });
@@ -286,49 +289,58 @@ export default function OrderPage() {
 
     setIsSaving(true);
 
- const { error } = await supabase.from("orders").insert({
-  name: customerName,
-  email: customerEmail,
-  address: query || null,
-  parcel_number: parcelInfo.number,
-  municipality: parcelInfo.municipality,
-  area: parcelInfo.area,
-  longitude: parcelInfo.lon,
-  latitude: parcelInfo.lat,
-  raw_data: parcelInfo.raw,
-});
+    try {
+      const { data, error } = await supabase
+        .from("orders")
+        .insert({
+          name: customerName,
+          email: customerEmail,
+          address: query || null,
+          parcel_number: parcelInfo.number,
+          municipality: parcelInfo.municipality,
+          area: parcelInfo.area,
+          longitude: parcelInfo.lon,
+          latitude: parcelInfo.lat,
+          raw_data: parcelInfo.raw,
+          payment_status: "pending",
+        })
+        .select()
+        .single();
 
-if (error) {
-  console.error(error);
-  alert("Fehler beim Speichern");
-  return;
-}
+      if (error) {
+        console.error(error);
+        alert("Fehler beim Speichern: " + error.message);
+        return;
+      }
 
-await fetch("/api/send", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    email: customerEmail,
-    name: customerName,
-    parcel: parcelInfo.number,
-  }),
-});
+      const checkoutRes = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: data.id,
+          email: customerEmail,
+          parcel_number: parcelInfo.number,
+          municipality: parcelInfo.municipality,
+        }),
+      });
 
-    setIsSaving(false);
+      const checkoutData = await checkoutRes.json();
 
-    if (error) {
+      if (!checkoutRes.ok || !checkoutData.url) {
+        console.error(checkoutData);
+        alert("Fehler beim Starten der Zahlung.");
+        return;
+      }
+
+      window.location.href = checkoutData.url;
+    } catch (error) {
       console.error(error);
-      alert("Fehler beim Speichern: " + error.message);
-      return;
+      alert("Unerwarteter Fehler beim Bestellen.");
+    } finally {
+      setIsSaving(false);
     }
-
-    alert("Gespeichert! Wir melden uns per E-Mail.");
-    resetSelection();
-    setCustomerName("");
-    setCustomerEmail("");
-    setQuery("");
   }
 
   function resetSelection() {
@@ -340,150 +352,171 @@ await fetch("/api/send", {
 
     setParcelInfo(null);
     setResults([]);
-    setMessage("Suchen Sie eine Adresse oder klicken Sie direkt auf eine Parzelle.");
+    setMessage("Adresse oder Parzelle suchen oder direkt auf die Karte klicken.");
   }
 
   return (
-    <main className="min-h-screen bg-[#dff5e8] px-6 py-10 text-neutral-950">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-semibold tracking-tight text-neutral-950">
-            Grundstück auswählen
-          </h1>
-          <p className="mt-3 max-w-2xl text-lg text-neutral-700">
-            Suchen Sie Ihre Adresse oder klicken Sie direkt auf die passende
-            Parzelle auf der Karte.
-          </p>
+    <main className="relative h-screen w-screen overflow-hidden bg-[#f5f1e8] text-[#1d2731]">
+  <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
+
+  <div className="pointer-events-none absolute inset-0 z-[1] bg-[#f5f1e8]/10" />
+
+      <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[410px] flex-col overflow-y-auto rounded-[28px] bg-[#f8f5ef]/95 p-8 shadow-2xl backdrop-blur-md">
+        <div className="mb-10 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#c6a46b] text-2xl text-[#c6a46b]">
+            ⌂
+          </div>
+
+          <div>
+            <div className="text-[44px] font-semibold leading-none tracking-tight">
+              Lota
+            </div>
+            <div className="mt-1 text-sm text-[#a07f4d]">
+              Grundstücke schneller einschätzen.
+            </div>
+          </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[380px_1fr]">
-          <aside className="h-fit rounded-2xl border border-neutral-200 bg-white p-6 shadow-md">
-            <label className="text-sm font-semibold text-neutral-900">
-              Adresse oder Parzelle
-            </label>
+        <h1 className="mb-7 text-5xl font-semibold leading-tight tracking-tight">
+          Baupotential
+          <br />
+          prüfen
+        </h1>
 
-            <div className="mt-3 flex gap-2">
+        <div className="relative mb-6">
+          <div className="flex items-center rounded-2xl border border-[#ddd6c8] bg-white px-4 py-4 shadow-sm">
+            <span className="mr-3 text-xl text-neutral-400">⌕</span>
+
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && searchAddress()}
+              placeholder="Adresse oder Parzelle suchen"
+              className="min-w-0 flex-1 bg-transparent text-[16px] outline-none placeholder:text-neutral-400"
+            />
+
+            <button
+              onClick={searchAddress}
+              disabled={isSearching}
+              className="ml-3 rounded-xl bg-[#1d2731] px-4 py-2 text-sm font-medium text-white transition hover:bg-black disabled:opacity-50"
+            >
+              {isSearching ? "..." : "Suche"}
+            </button>
+          </div>
+
+          {results.length > 0 && (
+            <div className="absolute left-0 right-0 top-[72px] z-20 overflow-hidden rounded-2xl border border-[#ddd6c8] bg-white shadow-xl">
+              {results.map((r, i) => (
+                <button
+                  key={i}
+                  onClick={() => selectSearchResult(r)}
+                  className="block w-full border-b border-neutral-100 px-4 py-3 text-left text-sm transition last:border-b-0 hover:bg-[#f5f1e8]"
+                >
+                  {r.attrs.label.replace(/<[^>]*>/g, "")}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <p className="mb-8 text-sm text-[#5f6872]">{message}</p>
+
+        <div className="border-t border-[#e7e0d4] pt-8">
+          <div className="mb-3 text-5xl font-semibold tracking-tight">
+            CHF 49.–
+          </div>
+
+          <div className="space-y-1 text-[18px] text-[#3d4752]">
+            <div>Baupotential auf Karte dargestellt</div>
+            <div>PDF per E-Mail</div>
+          </div>
+
+          <Link
+            href="/examples"
+            className="mt-8 inline-flex items-center gap-2 text-[18px] font-medium text-[#a07f4d] transition hover:opacity-70"
+          >
+            Beispielanalyse sehen
+            <span>›</span>
+          </Link>
+        </div>
+
+        {parcelInfo && (
+          <div className="mt-8 rounded-2xl border border-[#d8c7a3] bg-white/75 p-5">
+            <h2 className="font-semibold">Ausgewählte Liegenschaft</h2>
+
+            <div className="mt-4 space-y-1 text-sm text-[#3d4752]">
+              <p>
+                <strong>Parzelle:</strong> {parcelInfo.number}
+              </p>
+              <p>
+                <strong>Gemeinde:</strong> {parcelInfo.municipality}
+              </p>
+              <p>
+                <strong>Fläche:</strong> {parcelInfo.area}
+              </p>
+            </div>
+
+            <div className="mt-5 space-y-3">
               <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && searchAddress()}
-                placeholder="z.B. Baumgartenweg 21"
-                className="min-w-0 flex-1 rounded-xl border border-neutral-300 px-3 py-3 text-neutral-950 placeholder:text-neutral-400 focus:border-black focus:outline-none"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Ihr Name"
+                className="w-full rounded-xl border border-[#ddd6c8] bg-white px-3 py-3 outline-none focus:border-[#a07f4d]"
               />
 
-              <button
-                onClick={searchAddress}
-                disabled={isSearching}
-                className="rounded-xl bg-black px-5 py-3 font-medium text-white transition hover:bg-neutral-800 disabled:opacity-50"
-              >
-                {isSearching ? "..." : "Suche"}
-              </button>
+              <input
+                value={customerEmail}
+                onChange={(e) => setCustomerEmail(e.target.value)}
+                placeholder="ihre@email.ch"
+                type="email"
+                className="w-full rounded-xl border border-[#ddd6c8] bg-white px-3 py-3 outline-none focus:border-[#a07f4d]"
+              />
             </div>
 
-            <p className="mt-3 text-sm text-neutral-700">{message}</p>
+            <button
+              onClick={saveOrder}
+              disabled={isSaving}
+              className="mt-5 w-full rounded-xl bg-[#1d2731] py-3 font-medium text-white transition hover:bg-black disabled:opacity-50"
+            >
+              {isSaving ? "Weiter zur Zahlung..." : "Analyse bestellen"}
+            </button>
 
-            {results.length > 0 && (
-              <div className="mt-5 space-y-2">
-                {results.map((r, i) => (
-                  <button
-                    key={i}
-                    onClick={() => selectSearchResult(r)}
-                    className="w-full rounded-xl border border-neutral-200 bg-white p-3 text-left text-sm text-neutral-900 transition hover:border-black hover:bg-neutral-50"
-                  >
-                    {r.attrs.label.replace(/<[^>]*>/g, "")}
-                  </button>
-                ))}
-              </div>
-            )}
+            <button
+              onClick={resetSelection}
+              className="mt-2 w-full rounded-xl border border-[#ddd6c8] bg-white py-3 font-medium transition hover:border-[#1d2731]"
+            >
+              Anderes Grundstück wählen
+            </button>
+          </div>
+        )}
 
-            {parcelInfo && (
-              <div className="mt-6 rounded-xl bg-[#eefaf3] p-4 ring-1 ring-green-200">
-                <h2 className="font-semibold text-neutral-950">
-                  Ausgewählte Liegenschaft
-                </h2>
-
-                <div className="mt-4 space-y-2 text-sm text-neutral-800">
-                  <p>
-                    <strong>Parzelle:</strong> {parcelInfo.number}
-                  </p>
-                  <p>
-                    <strong>Gemeinde:</strong> {parcelInfo.municipality}
-                  </p>
-                  <p>
-                    <strong>Fläche:</strong> {parcelInfo.area}
-                  </p>
-                </div>
-
-                <div className="mt-5 space-y-3">
-                  <div>
-                    <label className="text-sm font-medium text-neutral-900">
-                      Name
-                    </label>
-                    <input
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="Ihr Name"
-                      className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-3 text-neutral-950 placeholder:text-neutral-400 focus:border-black focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-neutral-900">
-                      E-Mail
-                    </label>
-                    <input
-                      value={customerEmail}
-                      onChange={(e) => setCustomerEmail(e.target.value)}
-                      placeholder="ihre@email.ch"
-                      type="email"
-                      className="mt-1 w-full rounded-xl border border-neutral-300 px-3 py-3 text-neutral-950 placeholder:text-neutral-400 focus:border-black focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <details className="mt-4 text-xs text-neutral-600">
-                  <summary className="cursor-pointer">
-                    Technische Daten anzeigen
-                  </summary>
-                  <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-white p-3">
-                    {JSON.stringify(parcelInfo.raw, null, 2)}
-                  </pre>
-                </details>
-
-                <div className="mt-6 space-y-2">
-                  <button
-                    onClick={saveOrder}
-                    disabled={isSaving}
-                    className="w-full rounded-xl bg-black py-3 font-medium text-white transition hover:bg-neutral-800 disabled:opacity-50"
-                  >
-                    {isSaving ? "Speichern..." : "Daten speichern"}
-                  </button>
-
-                  <button
-                    onClick={resetSelection}
-                    className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-medium text-neutral-900 transition hover:border-black"
-                  >
-                    Nein, anderes auswählen
-                  </button>
-                </div>
-              </div>
-            )}
-          </aside>
-
-          <section className="relative h-[660px] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
-            <div ref={mapContainerRef} className="h-full w-full" />
-
-            {isSelecting && (
-              <div className="absolute left-4 top-4 rounded-full bg-black px-4 py-2 text-sm font-medium text-white shadow">
-                Parzelle wird ermittelt...
-              </div>
-            )}
-
-            <div className="absolute bottom-4 left-4 rounded-full bg-white/95 px-3 py-1.5 text-xs font-medium text-neutral-700 shadow">
-              Amtliche Parzellendaten
-            </div>
-          </section>
+        <div className="mt-auto flex flex-wrap gap-x-4 gap-y-2 border-t border-[#e7e0d4] pt-6 text-sm text-[#4d5761]">
+          <Link href="/about" className="hover:opacity-60">
+            Über uns
+          </Link>
+          <span>·</span>
+          <Link href="/agb" className="hover:opacity-60">
+            AGB
+          </Link>
+          <span>·</span>
+          <Link href="/datenschutz" className="hover:opacity-60">
+            Datenschutz
+          </Link>
+          <span>·</span>
+          <Link href="/impressum" className="hover:opacity-60">
+            Impressum
+          </Link>
         </div>
+      </aside>
+
+      {isSelecting && (
+        <div className="absolute right-6 top-6 z-10 rounded-full bg-[#1d2731] px-5 py-3 text-sm font-medium text-white shadow-xl">
+          Parzelle wird ermittelt...
+        </div>
+      )}
+
+      <div className="absolute bottom-6 left-[455px] z-10 rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-[#4d5761] shadow">
+        Amtliche Parzellendaten
       </div>
     </main>
   );

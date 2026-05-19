@@ -5,6 +5,7 @@ import Link from "next/link";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/lib/supabase";
+import { loadMapView, saveMapView } from "@/lib/mapView";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -47,17 +48,21 @@ export default function OrderPage() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const view = loadMapView({ center: [7.4474, 46.9481], zoom: 15.5 });
+
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
-      center: [7.4474, 46.9481],
-      zoom: 15.5,
+      center: view.center,
+      zoom: view.zoom,
       maxZoom: 20,
     });
 
     mapRef.current = map;
 
     map.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+
+    map.on("moveend", () => saveMapView(map));
 
     map.on("load", async () => {
       map.addSource("official-parcels", {
@@ -409,12 +414,23 @@ export default function OrderPage() {
           </div>
         </div>
 
-        <button
-          onClick={resetSelection}
-          className="mt-4 text-xs font-medium text-[#b6843b] hover:opacity-70"
-        >
-          ← Zurück zur Suche
-        </button>
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+          {parcelInfo && (
+            <button
+              onClick={resetSelection}
+              className="text-xs font-medium text-[#b6843b] hover:opacity-70"
+            >
+              ← Zurück zur Suche
+            </button>
+          )}
+
+          <Link
+            href="/beispiele"
+            className="text-xs font-medium text-[#b6843b] hover:opacity-70"
+          >
+            Beispiele ansehen →
+          </Link>
+        </div>
       </div>
 
       <div className="relative mb-5">

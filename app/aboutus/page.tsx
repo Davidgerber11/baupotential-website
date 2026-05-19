@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { loadMapView, saveMapView } from "@/lib/mapView";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -20,17 +21,21 @@ export default function AboutUsPage() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const view = loadMapView({ center: [7.4474, 46.9481], zoom: 15.7 });
+
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
-      center: [7.4474, 46.9481],
-      zoom: 15.7,
+      center: view.center,
+      zoom: view.zoom,
       interactive: true,
     });
 
     mapRef.current = map;
 
     map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    map.on("moveend", () => saveMapView(map));
 
     map.on("load", () => {
       map.addSource("official-parcels", {
@@ -44,17 +49,17 @@ export default function AboutUsPage() {
       });
 
       map.addLayer({
-  id: "swiss-map",
-  type: "raster",
-  source: "swiss-wms",
-  paint: {
-    "raster-opacity": 0.55,
-    "raster-saturation": -0.6,
-    "raster-contrast": 0.15,
-    "raster-brightness-min": 0.15,
-    "raster-brightness-max": 0.95,
-  },
-});
+        id: "swiss-map",
+        type: "raster",
+        source: "official-parcels",
+        paint: {
+          "raster-opacity": 0.55,
+          "raster-saturation": -0.6,
+          "raster-contrast": 0.15,
+          "raster-brightness-min": 0.15,
+          "raster-brightness-max": 0.95,
+        },
+      });
     });
 
     return () => {

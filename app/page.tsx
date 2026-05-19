@@ -183,7 +183,8 @@ export default function OrderPage() {
       const attrs = parcel.properties || parcel.attributes || parcel.attrs || {};
 
     console.log("PARCEL ATTRS:", attrs);
-
+    
+    drawParcel(parcel.geometry);
     zoomToGeometry(parcel.geometry);
 
     setParcelInfo({

@@ -155,6 +155,74 @@ export default function OrderPage() {
     }
   }
 
+  function geodesicArea(geometry: any): number {
+    const R = 6378137;
+    const rad = (d: number) => (d * Math.PI) / 180;
+
+    function ringArea(ring: number[][]): number {
+      const n = ring.length;
+      if (n < 3) return 0;
+      let total = 0;
+      for (let i = 0; i < n; i++) {
+        const lo = ring[i === 0 ? n - 1 : i - 1];
+        const mi = ring[i];
+        const hi = ring[i === n - 1 ? 0 : i + 1];
+        total += (rad(hi[0]) - rad(lo[0])) * Math.sin(rad(mi[1]));
+      }
+      return Math.abs((total * R * R) / 2);
+    }
+
+    function polygonArea(rings: number[][][]): number {
+      if (!rings.length) return 0;
+      let a = ringArea(rings[0]);
+      for (let i = 1; i < rings.length; i++) a -= ringArea(rings[i]);
+      return a;
+    }
+
+    if (geometry?.type === "Polygon") return polygonArea(geometry.coordinates);
+    if (geometry?.type === "MultiPolygon") {
+      return geometry.coordinates.reduce(
+        (sum: number, poly: number[][][]) => sum + polygonArea(poly),
+        0
+      );
+    }
+    return 0;
+  }
+
+  async function identifyMunicipality(lon: number, lat: number): Promise<string | null> {
+    try {
+      const params = new URLSearchParams({
+        geometry: `${lon},${lat}`,
+        geometryType: "esriGeometryPoint",
+        sr: "4326",
+        layers: "all:ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill",
+        returnGeometry: "false",
+        tolerance: "0",
+        lang: "de",
+        limit: "1",
+      });
+
+      const res = await fetch(
+        `https://api3.geo.admin.ch/rest/services/ech/MapServer/identify?${params.toString()}`
+      );
+      const data = await res.json();
+      const hit = data.results?.[0];
+      const a = hit?.properties || hit?.attributes || hit?.attrs || {};
+
+      return (
+        a.gemname ||
+        a.name ||
+        a.bez ||
+        a.gemeindename ||
+        hit?.label ||
+        null
+      );
+    } catch (error) {
+      console.error("Municipality lookup failed:", error);
+      return null;
+    }
+  }
+
   async function identifyParcel(lon: number, lat: number) {
     setIsSelecting(true);
     setMessage("Parzelle wird ermittelt...");
@@ -187,10 +255,10 @@ export default function OrderPage() {
 
       const attrs = parcel.properties || parcel.attributes || parcel.attrs || {};
 
-    console.log("PARCEL ATTRS:", attrs);
-    
     drawParcel(parcel.geometry);
     zoomToGeometry(parcel.geometry);
+
+    const municipality = await identifyMunicipality(lon, lat);
 
     setParcelInfo({
       number:
@@ -201,23 +269,12 @@ export default function OrderPage() {
         parcel.id ||
         "—",
 
-      municipality:
-        attrs.gemeinde ||
-        attrs.GEMEINDE ||
-        attrs.gemeindename ||
-        attrs.GEMEINDENAME ||
-        attrs.municipality ||
-        attrs.MUNICIPALITY ||
-        attrs.mun_name ||
-        attrs.gmdname ||
-        attrs.gemname ||
-        attrs.name ||
-        "—",
+      municipality: municipality || "—",
 
-      area:
-        attrs.flaeche || attrs.area || attrs.liegenschaft_flaeche
-          ? `${attrs.flaeche || attrs.area || attrs.liegenschaft_flaeche} m²`
-          : "—",
+      area: (() => {
+        const m2 = geodesicArea(parcel.geometry);
+        return m2 > 0 ? `${Math.round(m2).toLocaleString("de-CH")} m²` : "—";
+      })(),
 
       lon,
       lat,
@@ -481,9 +538,20 @@ export default function OrderPage() {
             {query || `Parzelle ${parcelInfo.number}`}
           </h1>
 
-          <div className="mt-1 text-sm font-medium text-[#555]">
-            {parcelInfo.municipality}
-          </div>
+          <dl className="mt-3 space-y-1 text-sm text-[#555]">
+            <div className="flex gap-2">
+              <dt className="font-medium text-[#2b2f2a]">Gemeinde:</dt>
+              <dd>{parcelInfo.municipality}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="font-medium text-[#2b2f2a]">Parzelle:</dt>
+              <dd>{parcelInfo.number}</dd>
+            </div>
+            <div className="flex gap-2">
+              <dt className="font-medium text-[#2b2f2a]">Fläche:</dt>
+              <dd>{parcelInfo.area}</dd>
+            </div>
+          </dl>
 
           <div className="mt-3 text-sm text-[#b6843b]">
             📍 Auf der Karte markiert

@@ -7,6 +7,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { supabase } from "@/lib/supabase";
 import demoBuildable from "@/lib/demo-buildable.json";
 import demoBuildings from "@/lib/demo-buildings.json";
+import demoEdges from "@/lib/demo-edges.json";
+import demoDims from "@/lib/demo-dims.json";
 import { loadMapView, saveMapView } from "@/lib/mapView";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -44,7 +46,7 @@ const DEMO = {
   potential: {
     zone: "Wohnzone, 2 Geschosse",
     buildableArea: 307,
-    floorArea: 383,
+    floorArea: 614, // 307 m² Grundflaeche x 2 Vollgeschosse
   } as Potential,
 };
 
@@ -332,7 +334,13 @@ export default function OrderPage() {
       } else {
         // Startbildschirm: Vorzeige-Parzelle direkt analysiert anzeigen, damit der
         // Nutzer sofort sieht, was Lota liefert (Parzelle + bebaubare Zone + Werte).
-        map.jumpTo({ center: [DEMO.lon, DEMO.lat], zoom: 17.5 });
+        // padding.left schiebt die Kartenmitte nach rechts, damit die Beispiel-
+        // Parzelle 601 nicht hinter dem Info-Panel (links, ~460px) verschwindet.
+        map.jumpTo({
+          center: [DEMO.lon, DEMO.lat],
+          zoom: 17.5,
+          padding: { left: 460, top: 0, right: 0, bottom: 0 },
+        });
         setTimeout(() => {
           identifyParcel(DEMO.lon, DEMO.lat, {
             potential: DEMO.potential,
@@ -493,7 +501,9 @@ export default function OrderPage() {
       const attrs = parcel.properties || parcel.attributes || parcel.attrs || {};
 
     drawParcel(parcel.geometry);
-    zoomToGeometry(parcel.geometry);
+    // Demo behaelt die kuratierte Weitansicht (601 + Nachbarn, via jumpTo mit
+    // Offset). Nur bei echter Auswahl auf die Parzelle zoomen.
+    if (!opts?.isDemo) zoomToGeometry(parcel.geometry);
 
     // Waehlt der Nutzer ein eigenes Grundstueck (kein Demo), die vorberechneten
     // Demo-Bau-Flaechen entfernen.
@@ -662,11 +672,17 @@ export default function OrderPage() {
       "neighbors-line",
       "neighbors-label",
       "buildings-line",
+      "edges-line",
+      "edges-label",
+      "dims-line",
+      "dims-label",
     ]) {
       if (map.getLayer(id)) map.removeLayer(id);
     }
     if (map.getSource("neighbors")) map.removeSource("neighbors");
     if (map.getSource("buildings")) map.removeSource("buildings");
+    if (map.getSource("edges")) map.removeSource("edges");
+    if (map.getSource("dims")) map.removeSource("dims");
   }
 
   // Echte bebaubare Flaechen (601 + Nachbarn 608/264/609/254) als Punkt-Muster
@@ -725,6 +741,75 @@ export default function OrderPage() {
         "line-color": "#ffffff",
         "line-width": 1.8,
         "line-opacity": 0.95,
+      },
+    });
+
+    // Pro Parzellenkante einzeichnen, WELCHER Abstand dort genommen wurde:
+    // rot = grosser Grenzabstand, blau = kleiner Grenzabstand, gruen =
+    // Strassenabstand. Geometrien + Typ/Distanz aus der Engine (demo-edges.json).
+    map.addSource("edges", {
+      type: "geojson",
+      data: demoEdges as unknown as GeoJSON.FeatureCollection,
+    });
+    map.addLayer({
+      id: "edges-line",
+      type: "line",
+      source: "edges",
+      layout: { "line-join": "round", "line-cap": "round" },
+      paint: {
+        "line-color": [
+          "match",
+          ["get", "kind"],
+          "gross", "#ff5436",
+          "klein", "#2dbdf0",
+          "strasse", "#36d97a",
+          "#cccccc",
+        ],
+        "line-width": 3.4,
+        "line-opacity": 0.95,
+      },
+    });
+    // Masspfeile: bemasster Doppelpfeil von der Grenze bis zur bebaubaren Flaeche
+    // mit Distanz-Label -> macht den genommenen Abstand fuer Laien verstaendlich.
+    const dimColor: mapboxgl.ExpressionSpecification = [
+      "match",
+      ["get", "kind"],
+      "gross", "#ff5436",
+      "klein", "#2dbdf0",
+      "strasse", "#36d97a",
+      "#cccccc",
+    ];
+    map.addSource("dims", {
+      type: "geojson",
+      data: demoDims as unknown as GeoJSON.FeatureCollection,
+    });
+    map.addLayer({
+      id: "dims-line",
+      type: "line",
+      source: "dims",
+      filter: ["==", ["get", "role"], "arrow"],
+      layout: { "line-join": "round", "line-cap": "round" },
+      paint: {
+        "line-color": dimColor,
+        "line-width": 2,
+        "line-opacity": 0.95,
+      },
+    });
+    map.addLayer({
+      id: "dims-label",
+      type: "symbol",
+      source: "dims",
+      filter: ["==", ["get", "role"], "label"],
+      layout: {
+        "text-field": ["get", "label"],
+        "text-size": 12,
+        "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+        "text-allow-overlap": false,
+      },
+      paint: {
+        "text-color": "#ffffff",
+        "text-halo-color": "#10171e",
+        "text-halo-width": 1.8,
       },
     });
   }
@@ -813,8 +898,13 @@ export default function OrderPage() {
     extendBounds(geometry.coordinates);
 
     if (!bounds.isEmpty()) {
+      // Auf breiten Screens das Info-Panel (links, ~440px) freihalten, damit die
+      // ausgewaehlte Parzelle rechts daneben erscheint statt dahinter.
+      const wide = (map.getContainer().clientWidth || 0) > 760;
       map.fitBounds(bounds, {
-        padding: 120,
+        padding: wide
+          ? { left: 480, top: 90, right: 90, bottom: 90 }
+          : 120,
         maxZoom: 18,
         duration: 700,
       });
@@ -1057,6 +1147,30 @@ export default function OrderPage() {
                 <div className="flex items-center gap-2">
                   <span className="inline-block h-3 w-3 rounded-sm border-2 border-white bg-transparent" />
                   Weisse Kontur = bestehendes Gebäude
+                </div>
+                <div className="mt-1.5 border-t border-[#e7decd] pt-1.5 font-medium text-[#6f6450]">
+                  Genommener Abstand pro Grenze
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-[3px] w-4 rounded-full"
+                    style={{ backgroundColor: "#ff5436" }}
+                  />
+                  Rot = grosser Grenzabstand (13 m)
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-[3px] w-4 rounded-full"
+                    style={{ backgroundColor: "#2dbdf0" }}
+                  />
+                  Blau = kleiner Grenzabstand (6 m)
+                </div>
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-[3px] w-4 rounded-full"
+                    style={{ backgroundColor: "#36d97a" }}
+                  />
+                  Grün = Strassenabstand (3,6 m)
                 </div>
               </div>
             </div>

@@ -332,22 +332,16 @@ export default function OrderPage() {
           }, 500);
         }
       } else {
-        // Startbildschirm: Vorzeige-Parzelle direkt analysiert anzeigen, damit der
-        // Nutzer sofort sieht, was Lota liefert (Parzelle + bebaubare Zone + Werte).
-        // padding.left schiebt die Kartenmitte nach rechts, damit die Beispiel-
-        // Parzelle 601 nicht hinter dem Info-Panel (links, ~460px) verschwindet.
+        // Startbildschirm: Beispiel-Parzellen direkt auf der Karte analysiert
+        // zeigen (oranges Baufeld + Masspfeile) -> die Karte spricht fuer sich.
+        // Das Panel bleibt im Normalzustand (Suche), daher KEIN identifyParcel.
+        // padding.left haelt das Info-Panel (links, ~460px) frei.
         map.jumpTo({
           center: [DEMO.lon, DEMO.lat],
           zoom: 17.5,
           padding: { left: 460, top: 0, right: 0, bottom: 0 },
         });
-        setTimeout(() => {
-          identifyParcel(DEMO.lon, DEMO.lat, {
-            potential: DEMO.potential,
-            isDemo: true,
-            parcelArea: DEMO.parcelArea,
-          }).then(() => drawDemoPotential());
-        }, 400);
+        setTimeout(() => drawDemoPotential(), 400);
       }
     });
 
@@ -613,7 +607,7 @@ export default function OrderPage() {
     if (map.getSource("buildable")) map.removeSource("buildable");
   }
 
-  // Einmaliges Punkt-Muster (goldene Punkte) fuer die Bau-Zone erzeugen.
+  // Einmaliges Punkt-Muster (kraeftiges Orange) fuer die Bau-Zone erzeugen.
   function ensureDotPattern(map: mapboxgl.Map) {
     if (map.hasImage("buildable-dots")) return;
     const s = 14;
@@ -622,7 +616,7 @@ export default function OrderPage() {
     cnv.height = s;
     const ctx = cnv.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = "rgba(201, 155, 90, 0.95)";
+    ctx.fillStyle = "rgba(255, 122, 0, 0.97)";
     ctx.beginPath();
     ctx.arc(s / 2, s / 2, 2.4, 0, Math.PI * 2);
     ctx.fill();
@@ -708,7 +702,7 @@ export default function OrderPage() {
       id: "neighbors-line",
       type: "line",
       source: "neighbors",
-      paint: { "line-color": "#c79b5a", "line-width": 1.3, "line-opacity": 0.85 },
+      paint: { "line-color": "#ff7a00", "line-width": 1.6, "line-opacity": 0.95 },
     });
     map.addLayer({
       id: "neighbors-label",
@@ -744,9 +738,7 @@ export default function OrderPage() {
       },
     });
 
-    // Pro Parzellenkante einzeichnen, WELCHER Abstand dort genommen wurde:
-    // rot = grosser Grenzabstand, blau = kleiner Grenzabstand, gruen =
-    // Strassenabstand. Geometrien + Typ/Distanz aus der Engine (demo-edges.json).
+    // Parzellengrenzen als feine weisse Linie (der Distanz-Typ steht am Pfeil).
     map.addSource("edges", {
       type: "geojson",
       data: demoEdges as unknown as GeoJSON.FeatureCollection,
@@ -757,28 +749,13 @@ export default function OrderPage() {
       source: "edges",
       layout: { "line-join": "round", "line-cap": "round" },
       paint: {
-        "line-color": [
-          "match",
-          ["get", "kind"],
-          "gross", "#ff5436",
-          "klein", "#2dbdf0",
-          "strasse", "#36d97a",
-          "#cccccc",
-        ],
-        "line-width": 3.4,
+        "line-color": "#ffffff",
+        "line-width": 2.2,
         "line-opacity": 0.95,
       },
     });
-    // Masspfeile: bemasster Doppelpfeil von der Grenze bis zur bebaubaren Flaeche
+    // Masspfeile: weisser Doppelpfeil von der Grenze bis zur bebaubaren Flaeche
     // mit Distanz-Label -> macht den genommenen Abstand fuer Laien verstaendlich.
-    const dimColor: mapboxgl.ExpressionSpecification = [
-      "match",
-      ["get", "kind"],
-      "gross", "#ff5436",
-      "klein", "#2dbdf0",
-      "strasse", "#36d97a",
-      "#cccccc",
-    ];
     map.addSource("dims", {
       type: "geojson",
       data: demoDims as unknown as GeoJSON.FeatureCollection,
@@ -790,9 +767,9 @@ export default function OrderPage() {
       filter: ["==", ["get", "role"], "arrow"],
       layout: { "line-join": "round", "line-cap": "round" },
       paint: {
-        "line-color": dimColor,
-        "line-width": 2,
-        "line-opacity": 0.95,
+        "line-color": "#16c6ff",
+        "line-width": 2.2,
+        "line-opacity": 1,
       },
     });
     map.addLayer({
@@ -807,9 +784,9 @@ export default function OrderPage() {
         "text-allow-overlap": false,
       },
       paint: {
-        "text-color": "#ffffff",
-        "text-halo-color": "#10171e",
-        "text-halo-width": 1.8,
+        "text-color": "#16c6ff",
+        "text-halo-color": "#06212e",
+        "text-halo-width": 1.9,
       },
     });
   }
@@ -1140,37 +1117,32 @@ export default function OrderPage() {
                 <div className="flex items-center gap-2">
                   <span
                     className="inline-block h-3 w-3 rounded-full"
-                    style={{ backgroundColor: "#c79b5a" }}
+                    style={{ backgroundColor: "#ff7a00" }}
                   />
-                  Goldene Punkte = bebaubare Fläche
+                  Orange = bebaubares Baufeld
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-block h-3 w-3 rounded-sm border-2 border-white bg-transparent" />
+                  <span className="inline-flex h-3.5 w-4 items-center justify-center rounded-sm bg-[#2b3540]">
+                    <span className="h-[2px] w-3 rounded-full bg-white" />
+                  </span>
+                  Weisse Linie = Parzellengrenze
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-3.5 w-4 items-center justify-center rounded-sm bg-[#2b3540]">
+                    <span className="h-2 w-2 border border-white bg-transparent" />
+                  </span>
                   Weisse Kontur = bestehendes Gebäude
                 </div>
-                <div className="mt-1.5 border-t border-[#e7decd] pt-1.5 font-medium text-[#6f6450]">
-                  Genommener Abstand pro Grenze
-                </div>
-                <div className="flex items-center gap-2">
+                <div className="mt-1.5 flex items-center gap-2 border-t border-[#e7decd] pt-1.5 font-medium text-[#6f6450]">
                   <span
                     className="inline-block h-[3px] w-4 rounded-full"
-                    style={{ backgroundColor: "#ff5436" }}
+                    style={{ backgroundColor: "#16c6ff" }}
                   />
-                  Rot = grosser Grenzabstand (13 m)
+                  Cyan Masspfeile = Abstand bis zum Baufeld
                 </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-[3px] w-4 rounded-full"
-                    style={{ backgroundColor: "#2dbdf0" }}
-                  />
-                  Blau = kleiner Grenzabstand (6 m)
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="inline-block h-[3px] w-4 rounded-full"
-                    style={{ backgroundColor: "#36d97a" }}
-                  />
-                  Grün = Strassenabstand (3,6 m)
+                <div className="text-[#8a7e66]">
+                  Zahl = Meter · grosser GA 13 m · kleiner GA 6 m · Strassenabstand
+                  3,6 m
                 </div>
               </div>
             </div>
@@ -1183,8 +1155,8 @@ export default function OrderPage() {
           {parcelInfo.isDemo && (
             <div className="mt-3 rounded-md bg-[#1d2731] px-3 py-2 text-xs leading-relaxed text-white">
               👉 Wir kennen das Baupotential{" "}
-              <strong>jedes</strong> Grundstücks — die goldenen Punkte zeigen die
-              bebaubare Fläche. Suchen Sie oben Ihr eigenes Grundstück.
+              <strong>jedes</strong> Grundstücks — die orange Fläche zeigt das
+              bebaubare Baufeld. Suchen Sie oben Ihr eigenes Grundstück.
             </div>
           )}
         </div>

@@ -69,12 +69,12 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <main className="relative h-screen w-screen overflow-hidden bg-[#f5f1e8] text-[#1d2731]">
+    <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f5f1e8] text-[#1d2731]">
       <div ref={mapContainerRef} className="absolute inset-0 h-full w-full" />
 
       <div className="absolute inset-0 bg-[#f4eadc]/20 pointer-events-none" />
 
-      <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[420px] flex-col overflow-y-auto rounded-[18px] bg-[#fbf7ef]/95 p-7 shadow-2xl backdrop-blur-md">
+      <aside className="absolute inset-x-3 top-3 z-10 flex max-h-[calc(100dvh-24px)] flex-col overflow-y-auto rounded-[18px] bg-[#fbf7ef]/95 p-5 shadow-2xl backdrop-blur-md md:inset-x-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[420px] md:p-7">
         <Link href="/" className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#c79b5a] text-[#b17a2e]">
             ⌂

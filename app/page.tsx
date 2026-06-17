@@ -56,6 +56,9 @@ const DEMO = {
 export default function OrderPage() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
+  // Verhindert, dass nach Auswahl eines Treffers (setQuery setzt das Label)
+  // sofort wieder Vorschläge geladen werden.
+  const suppressSearchRef = useRef(false);
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
@@ -73,6 +76,38 @@ export default function OrderPage() {
   );
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
+
+  // Live-Vorschläge schon beim Tippen (entprellt). Laufende Anfragen werden
+  // abgebrochen; nach Auswahl eines Treffers wird einmal übersprungen.
+  useEffect(() => {
+    const q = query.trim();
+    if (suppressSearchRef.current) {
+      suppressSearchRef.current = false;
+      return;
+    }
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
+    const ctrl = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const url =
+          `https://api3.geo.admin.ch/rest/services/ech/SearchServer` +
+          `?searchText=${encodeURIComponent(q)}` +
+          `&type=locations&origins=address,parcel&limit=8&sr=4326`;
+        const res = await fetch(url, { signal: ctrl.signal });
+        const data = await res.json();
+        setResults(data.results || []);
+      } catch {
+        // abgebrochen oder Netzwerkfehler -> Vorschläge unverändert lassen
+      }
+    }, 250);
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, [query]);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -919,6 +954,7 @@ export default function OrderPage() {
     const lat = result.attrs.lat;
     const label = result.attrs.label.replace(/<[^>]*>/g, "");
 
+    suppressSearchRef.current = true;
     setQuery(label);
     setResults([]);
 

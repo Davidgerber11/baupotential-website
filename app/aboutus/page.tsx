@@ -148,12 +148,42 @@ export default function AboutUsPage() {
             className="mb-3 w-full rounded-xl"
           />
 
-          <h3 className="text-sm font-bold">Yves Stauber &amp; David Gerber</h3>
           <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
-            Wir sind die beiden Gründer von Lota. Wir verbinden Geodaten,
-            Raumplanung und Softwareentwicklung mit Wissen aus dem Immobilien-
-            und Bausektor — mit dem Ziel, das Baupotential jedes Grundstücks
-            verständlich und schnell zugänglich zu machen.
+            Wir sind zwei Studenten der ETH Zürich und beide im Raum Bern
+            aufgewachsen.
+          </p>
+
+          <div className="mt-4 space-y-3">
+            <div>
+              <h3 className="text-sm font-bold">
+                Yves Stauber{" "}
+                <span className="font-medium text-[#a97937]">(rechts)</span>
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+                Studiert Bauingenieurwissenschaften an der ETH Zürich. Bereits
+                während des Gymnasiums hat er sich aktiv mit Immobilienentwicklung
+                auseinandergesetzt und danach ein Jahr bei einem Totalunternehmen
+                gearbeitet, wo er Immobilien mitentwickelt hat.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-bold">
+                David Gerber{" "}
+                <span className="font-medium text-[#a97937]">(links)</span>
+              </h3>
+              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+                Studiert Erd- und Klimawissenschaften an der ETH Zürich, zuvor
+                Informationstechnologie. Er bringt eine grosse Affinität für
+                Technologie mit.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs leading-relaxed text-[#52606b]">
+            Gemeinsam verbinden wir Wissen aus Immobilienentwicklung und
+            Technologie, um das Baupotential jedes Grundstücks verständlich und
+            schnell zugänglich zu machen.
           </p>
         </div>
 

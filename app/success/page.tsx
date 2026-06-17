@@ -33,7 +33,7 @@ export default function SuccessPage() {
         </p>
 
         <p className="mb-6 text-sm leading-relaxed text-[#42505c]">
-          Du erhältst die fertige PDF-Analyse in den nächsten Minuten per
+          Du erhältst die fertige PDF-Analyse innerhalb von 24 Stunden per
           E-Mail. Bitte prüfe ggf. auch deinen Spam-Ordner.
         </p>
 

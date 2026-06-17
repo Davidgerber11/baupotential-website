@@ -110,11 +110,11 @@ export default function AboutUsPage() {
             </div>
             <div>
               <h2 className="text-sm font-bold">
-                Analyse innerhalb eines Tages per E-Mail
+                Analyse innerhalb von 24 Stunden per E-Mail
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
-                Nach erfolgreicher Bezahlung wird die Analyse innerhalb eines
-                Tages an deine E-Mail-Adresse zugestellt.
+                Nach erfolgreicher Bezahlung wird die Analyse innerhalb von 24
+                Stunden an deine E-Mail-Adresse zugestellt.
               </p>
             </div>
           </div>

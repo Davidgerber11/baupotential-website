@@ -993,29 +993,23 @@ export default function OrderPage() {
   <main className="relative h-screen w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[380px] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-6 shadow-xl backdrop-blur">
+    <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[380px] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-5 shadow-xl backdrop-blur">
       {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
       <div className="shrink-0">
         <div className="flex items-center gap-3">
           <div className="text-3xl text-[#b6843b]">⌂</div>
-          <div>
-            <div className="text-2xl font-bold">Lota</div>
-            <div className="text-xs font-medium text-[#b6843b]">
-              Baupotential-Analyse für Schweizer Grundstücke
-            </div>
-          </div>
+          <div className="text-2xl font-bold">Lota</div>
         </div>
 
-        <p className="mt-3 text-sm leading-snug text-[#4b4f48]">
-          Wie viel lässt sich auf einem Grundstück bauen? Lota berechnet aus
-          Zonenplan und Baureglement die{" "}
+        <p className="mt-2 text-sm leading-snug text-[#4b4f48]">
+          Lota berechnet die{" "}
           <strong className="font-semibold text-[#2b2f2a]">
             bebaubare Grundfläche
           </strong>{" "}
-          jeder Schweizer Parzelle — als PDF-Bericht innerhalb von 24 Stunden.
+          jeder Schweizer Parzelle — als PDF-Bericht in 24 Stunden.
         </p>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
           {parcelInfo && (
             <button
               onClick={resetSelection}
@@ -1040,7 +1034,7 @@ export default function OrderPage() {
           </Link>
         </div>
 
-        <div className="mt-4 flex items-center gap-2.5">
+        <div className="mt-3 flex items-center gap-2.5">
           <span className="text-xs font-medium text-[#8a7e66]">Teil des</span>
           <span className="inline-flex items-center rounded-lg border border-[#e7decd] bg-white px-3 py-2 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1054,9 +1048,9 @@ export default function OrderPage() {
       </div>
 
       {/* Scrollbarer Bereich: Suche, Resultat, Bestellformular, Footer */}
-      <div className="mt-5 flex-1 overflow-y-auto pr-1">
-      <div className="relative mb-5">
-        <div className="flex items-center rounded-md border border-[#ddd4c4] bg-white px-3 py-3 shadow-sm">
+      <div className="mt-3 flex-1 overflow-y-auto pr-1">
+      <div className="relative mb-4">
+        <div className="flex items-center rounded-md border border-[#ddd4c4] bg-white px-3 py-2.5 shadow-sm">
           <span className="mr-2 text-neutral-400">⌕</span>
 
           <input
@@ -1192,33 +1186,31 @@ export default function OrderPage() {
           )}
         </div>
       ) : (
-        <div className="mb-5 border-b border-[#ddd4c4] pb-5 text-sm text-[#555]">
-          {message}
-        </div>
+        <div className="mb-3 text-xs leading-snug text-[#777]">{message}</div>
       )}
 
-      <div className="mb-5">
-        <h2 className="mb-3 text-base font-bold">Deine Daten</h2>
+      <div className="mb-3">
+        <h2 className="mb-2 text-base font-bold">Deine Daten</h2>
 
-        <label className="mb-1 block text-xs font-medium">Name</label>
+        <label className="mb-0.5 block text-xs font-medium">Name</label>
         <input
           value={customerName}
           onChange={(e) => setCustomerName(e.target.value)}
           placeholder="Vor- und Nachname"
-          className="mb-3 w-full rounded-md border border-[#ddd4c4] bg-white px-3 py-3 text-sm outline-none focus:border-[#b6843b]"
+          className="mb-2 w-full rounded-md border border-[#ddd4c4] bg-white px-3 py-2 text-sm outline-none focus:border-[#b6843b]"
         />
 
-        <label className="mb-1 block text-xs font-medium">E-Mail</label>
+        <label className="mb-0.5 block text-xs font-medium">E-Mail</label>
         <input
           value={customerEmail}
           onChange={(e) => setCustomerEmail(e.target.value)}
           placeholder="Deine E-Mail-Adresse"
           type="email"
-          className="w-full rounded-md border border-[#ddd4c4] bg-white px-3 py-3 text-sm outline-none focus:border-[#b6843b]"
+          className="w-full rounded-md border border-[#ddd4c4] bg-white px-3 py-2 text-sm outline-none focus:border-[#b6843b]"
         />
       </div>
 
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between">
         <div className="text-2xl font-bold">CHF 49.–</div>
 
         <div className="text-xs text-[#555]">
@@ -1228,7 +1220,7 @@ export default function OrderPage() {
       </div>
 
      
-      <div className="mt-5 space-y-3 text-xs text-[#444]">
+      <div className="mt-3 space-y-2 text-xs text-[#444]">
   <label className="flex gap-2">
     <input
       type="checkbox"
@@ -1275,16 +1267,16 @@ export default function OrderPage() {
     !acceptedTerms ||
     !acceptedDisclaimer
   }
-  className="mt-5 w-full rounded-xl bg-[#1d2731] py-3 font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+  className="mt-4 w-full rounded-xl bg-[#1d2731] py-2.5 font-medium text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
 >
   {isSaving ? "Weiter zur Zahlung..." : "Analyse bestellen"}
 </button>
 
-      <div className="mt-3 text-center text-xs text-[#777]">
+      <div className="mt-2.5 text-center text-xs text-[#777]">
         🔒 Sichere Zahlung über Stripe
       </div>
 
-      <div className="mt-auto flex flex-wrap justify-center gap-x-3 gap-y-2 border-t border-[#ddd4c4] pt-5 text-xs text-[#555]">
+      <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1 border-t border-[#ddd4c4] pt-3 text-xs text-[#555]">
         <Link href="/" className="hover:opacity-60">
           Startseite
         </Link>

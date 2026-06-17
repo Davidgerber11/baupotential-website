@@ -1040,14 +1040,14 @@ export default function OrderPage() {
           </Link>
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
-          <span className="text-xs text-[#8a7e66]">Teil des</span>
-          <span className="inline-flex items-center rounded-md border border-[#e7decd] bg-white px-2 py-1 shadow-sm">
+        <div className="mt-4 flex items-center gap-2.5">
+          <span className="text-xs font-medium text-[#8a7e66]">Teil des</span>
+          <span className="inline-flex items-center rounded-lg border border-[#e7decd] bg-white px-3 py-2 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logos/eth-sph.png"
               alt="ETH Student Project House"
-              className="h-6 w-auto"
+              className="h-8 w-auto"
             />
           </span>
         </div>

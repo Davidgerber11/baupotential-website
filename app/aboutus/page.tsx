@@ -25,15 +25,24 @@ export default function AboutUsPage() {
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      // Gleiche neue Karte wie die Startseite: Satellit + Kataster-Grenzen als
+      // feine weisse Linien (raster-color-Transparenz).
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
       center: view.center,
       zoom: view.zoom,
+      minZoom: 8,
+      maxZoom: 20,
+      dragRotate: false,
+      pitchWithRotate: false,
       interactive: true,
     });
 
     mapRef.current = map;
 
-    map.addControl(new mapboxgl.NavigationControl(), "top-right");
+    map.addControl(
+      new mapboxgl.NavigationControl({ showCompass: false }),
+      "top-right",
+    );
 
     map.on("moveend", () => saveMapView(map));
 
@@ -43,23 +52,53 @@ export default function AboutUsPage() {
         tiles: [
           "https://wmts.geo.admin.ch/1.0.0/ch.kantone.cadastralwebmap-farbe/default/current/3857/{z}/{x}/{y}.png",
         ],
-        tileSize: 512,
-        minzoom: 14,
+        tileSize: 256,
+        minzoom: 13,
         maxzoom: 20,
       });
 
-      map.addLayer({
-        id: "swiss-map",
-        type: "raster",
-        source: "official-parcels",
-        paint: {
-          "raster-opacity": 0.55,
-          "raster-saturation": -0.6,
-          "raster-contrast": 0.15,
-          "raster-brightness-min": 0.15,
-          "raster-brightness-max": 0.95,
+      const firstSymbolId = map
+        .getStyle()
+        .layers?.find((l) => l.type === "symbol")?.id;
+
+      map.addLayer(
+        {
+          id: "swiss-map",
+          type: "raster",
+          source: "official-parcels",
+          paint: {
+            "raster-resampling": "linear",
+            "raster-fade-duration": 300,
+            "raster-color-mix": [0.2126, 0.7152, 0.0722, 0],
+            "raster-color-range": [0, 1],
+            "raster-color": [
+              "interpolate",
+              ["linear"],
+              ["raster-value"],
+              0.0, "rgba(255, 255, 255, 1)",
+              0.3, "rgba(255, 255, 255, 0.5)",
+              0.5, "rgba(255, 255, 255, 0)",
+            ],
+            "raster-opacity": 0.95,
+          },
         },
-      });
+        firstSymbolId,
+      );
+
+      for (const b of ["building", "building_casing", "building_ln"]) {
+        if (map.getLayer(b)) map.setLayoutProperty(b, "visibility", "none");
+      }
+
+      for (const L of map.getStyle().layers || []) {
+        if (
+          L.type === "line" &&
+          /road|street|motorway|trunk|primary|secondary|bridge|tunnel|ferry|path|rail|transit|aeroway/i.test(
+            L.id,
+          )
+        ) {
+          map.setLayoutProperty(L.id, "visibility", "none");
+        }
+      }
     });
 
     return () => {

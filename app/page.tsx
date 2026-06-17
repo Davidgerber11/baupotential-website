@@ -1122,6 +1122,13 @@ export default function OrderPage() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && searchAddress()}
             placeholder="Adresse oder Parzelle suchen"
+            name="lota-grundstuecksuche"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            data-lpignore="true"
+            data-1p-ignore
+            data-form-type="other"
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-neutral-400"
           />
 

@@ -110,10 +110,17 @@ export default function OrderPage() {
       const wide = window.innerWidth >= 768;
       map.jumpTo({
         center: [DEMO.lon, DEMO.lat],
-        zoom: DEMO.zoom,
+        // Desktop: Panel links freihalten. Handy: Sheet unten -> Cluster in den
+        // sichtbaren oberen Bereich rahmen (padding unten).
+        zoom: wide ? DEMO.zoom : 17.4,
         padding: wide
           ? { left: 400, top: 0, right: 0, bottom: 0 }
-          : { left: 0, top: 0, right: 0, bottom: 0 },
+          : {
+              left: 16,
+              right: 16,
+              top: 16,
+              bottom: Math.round(window.innerHeight * 0.6),
+            },
       });
     }
 
@@ -890,13 +897,17 @@ export default function OrderPage() {
     extendBounds(geometry.coordinates);
 
     if (!bounds.isEmpty()) {
-      // Auf breiten Screens das Info-Panel (links, ~440px) freihalten, damit die
-      // ausgewaehlte Parzelle rechts daneben erscheint statt dahinter.
+      // Desktop: Info-Panel links (~440px) freihalten -> Parzelle rechts daneben.
+      // Handy: Bottom-Sheet unten freihalten -> Parzelle in den sichtbaren oberen
+      // Bereich rahmen (padding unten = Sheet-Hoehe).
       const wide = (map.getContainer().clientWidth || 0) > 760;
+      const mapH = map.getContainer().clientHeight || window.innerHeight;
       map.fitBounds(bounds, {
+        // Handy: padding unten = Sheet-Maxhoehe (68dvh), damit die Parzelle auch
+        // dann ueber dem Sheet bleibt, wenn es nach der Auswahl auf Maxhoehe waechst.
         padding: wide
           ? { left: 480, top: 90, right: 90, bottom: 90 }
-          : 120,
+          : { top: 60, left: 24, right: 24, bottom: Math.round(mapH * 0.68) },
         maxZoom: 18,
         duration: 700,
       });
@@ -1008,7 +1019,9 @@ export default function OrderPage() {
   <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute inset-x-3 top-3 z-10 flex max-h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-4 shadow-xl backdrop-blur md:inset-x-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[380px] md:p-5">
+    <aside className="absolute inset-x-0 bottom-0 z-10 flex max-h-[68dvh] flex-col overflow-hidden rounded-t-2xl bg-[#faf7f0]/97 p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:inset-x-auto md:bottom-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[380px] md:rounded-xl md:p-5 md:shadow-xl">
+      {/* Greifer-Bar: signalisiert auf dem Handy das Bottom-Sheet */}
+      <div className="mx-auto mb-2 h-1 w-10 shrink-0 rounded-full bg-[#d8cfbe] md:hidden" />
       {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
       <div className="shrink-0">
         <div className="flex items-center gap-3">

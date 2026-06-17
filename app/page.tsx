@@ -993,37 +993,49 @@ export default function OrderPage() {
   <main className="relative h-screen w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[360px] flex-col overflow-y-auto rounded-xl bg-[#faf7f0]/95 p-6 shadow-xl backdrop-blur">
-      <div className="mb-4">
+    <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[380px] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-6 shadow-xl backdrop-blur">
+      {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
+      <div className="shrink-0">
         <div className="flex items-center gap-3">
           <div className="text-3xl text-[#b6843b]">⌂</div>
           <div>
             <div className="text-2xl font-bold">Lota</div>
             <div className="text-xs font-medium text-[#b6843b]">
-              Grundstücke schneller einschätzen.
+              Baupotential-Analyse für Schweizer Grundstücke
             </div>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+        <p className="mt-3 text-sm leading-snug text-[#4b4f48]">
+          Wie viel lässt sich auf einem Grundstück bauen? Lota berechnet aus
+          Zonenplan und Baureglement die{" "}
+          <strong className="font-semibold text-[#2b2f2a]">
+            bebaubare Grundfläche
+          </strong>{" "}
+          jeder Schweizer Parzelle — als PDF-Bericht innerhalb von 24 Stunden.
+        </p>
+
+        <div className="mt-4 flex items-center gap-3">
           {parcelInfo && (
             <button
               onClick={resetSelection}
-              className="text-xs font-medium text-[#b6843b] hover:opacity-70"
+              className="text-sm font-medium text-[#b6843b] hover:opacity-70"
             >
-              ← Zurück zur Suche
+              ← Zurück
             </button>
           )}
 
           <Link
             href="/beispiele"
-            className="text-xs font-medium text-[#b6843b] hover:opacity-70"
+            className="inline-flex items-center gap-1.5 rounded-md bg-[#b6843b] px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#a3742f]"
           >
-            Beispiele ansehen →
+            📄 Beispiel-Bericht ansehen
           </Link>
         </div>
       </div>
 
+      {/* Scrollbarer Bereich: Suche, Resultat, Bestellformular, Footer */}
+      <div className="mt-5 flex-1 overflow-y-auto pr-1">
       <div className="relative mb-5">
         <div className="flex items-center rounded-md border border-[#ddd4c4] bg-white px-3 py-3 shadow-sm">
           <span className="mr-2 text-neutral-400">⌕</span>
@@ -1192,7 +1204,7 @@ export default function OrderPage() {
 
         <div className="text-xs text-[#555]">
           <div>📍 Baupotential auf Karte dargestellt</div>
-          <div>📄 PDF per E-Mail</div>
+          <div>📄 PDF innerhalb 24 Std. per E-Mail</div>
         </div>
       </div>
 
@@ -1273,6 +1285,7 @@ export default function OrderPage() {
         <Link href="/impressum" className="hover:opacity-60">
           Impressum
         </Link>
+      </div>
       </div>
     </aside>
 

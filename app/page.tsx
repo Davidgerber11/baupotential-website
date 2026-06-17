@@ -103,13 +103,17 @@ export default function OrderPage() {
 
     mapRef.current = map;
 
-    // Info-Panel (links) freihalten: Demo-Cluster sofort rechts daneben rahmen
-    // (vor dem ersten Frame -> kein sichtbares Nachspringen).
+    // Info-Panel freihalten: auf Desktop links (Panel daneben), auf dem Handy
+    // ohne Offset (Panel liegt oben, vollbreit). padding.left darf nicht groesser
+    // als die Kartenbreite sein -> sonst Fehldarstellung auf schmalen Screens.
     if (!hasInitParam) {
+      const wide = window.innerWidth >= 768;
       map.jumpTo({
         center: [DEMO.lon, DEMO.lat],
         zoom: DEMO.zoom,
-        padding: { left: 400, top: 0, right: 0, bottom: 0 },
+        padding: wide
+          ? { left: 400, top: 0, right: 0, bottom: 0 }
+          : { left: 0, top: 0, right: 0, bottom: 0 },
       });
     }
 
@@ -1001,10 +1005,10 @@ export default function OrderPage() {
   }
 
   return (
-  <main className="relative h-screen w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
+  <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute left-6 top-6 z-10 flex max-h-[calc(100vh-48px)] w-[380px] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-5 shadow-xl backdrop-blur">
+    <aside className="absolute inset-x-3 top-3 z-10 flex max-h-[calc(100dvh-24px)] flex-col overflow-hidden rounded-xl bg-[#faf7f0]/95 p-4 shadow-xl backdrop-blur md:inset-x-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[380px] md:p-5">
       {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
       <div className="shrink-0">
         <div className="flex items-center gap-3">

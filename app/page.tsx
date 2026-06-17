@@ -1039,6 +1039,18 @@ export default function OrderPage() {
             Über uns →
           </Link>
         </div>
+
+        <div className="mt-3 flex items-center gap-2">
+          <span className="text-xs text-[#8a7e66]">Teil des</span>
+          <span className="inline-flex items-center rounded-md border border-[#e7decd] bg-white px-2 py-1 shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logos/eth-sph.png"
+              alt="ETH Student Project House"
+              className="h-6 w-auto"
+            />
+          </span>
+        </div>
       </div>
 
       {/* Scrollbarer Bereich: Suche, Resultat, Bestellformular, Footer */}

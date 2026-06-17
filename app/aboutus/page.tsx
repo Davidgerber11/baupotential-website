@@ -173,9 +173,8 @@ export default function AboutUsPage() {
                 <span className="font-medium text-[#a97937]">(links)</span>
               </h3>
               <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
-                Studiert Erd- und Klimawissenschaften an der ETH Zürich, zuvor
-                Informationstechnologie. Er bringt eine grosse Affinität für
-                Technologie mit.
+                Studiert Erd- und Klimawissenschaften an der ETH Zürich. Er
+                bringt eine grosse Affinität für Technologie mit.
               </p>
             </div>
           </div>

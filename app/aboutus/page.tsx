@@ -188,6 +188,20 @@ export default function AboutUsPage() {
         </div>
 
         <div className="mt-6 border-t border-[#e4d8c7] pt-5">
+          <div className="mb-2 text-xs font-medium uppercase tracking-wide text-[#a97937]">
+            Teil von
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <div className="inline-flex rounded-xl border border-[#e4d8c7] bg-white p-3 shadow-sm">
+            <img
+              src="/logos/eth-sph.png"
+              alt="ETH Student Project House"
+              className="w-40"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 border-t border-[#e4d8c7] pt-5">
           <h2 className="text-sm font-bold">Hast du Fragen?</h2>
           <p className="mt-1 text-xs text-[#52606b]">
             Schreib uns an{" "}

@@ -1059,8 +1059,8 @@ export default function OrderPage() {
       </div>
 
       {/* Scrollbarer Bereich: Suche, Resultat, Bestellformular, Footer */}
-      <div className="mt-3 flex-1 overflow-y-auto pr-1">
-      <div className="relative mb-4">
+      <div className="mt-4 flex-1 overflow-y-auto border-t border-[#e7decd] pr-1 pt-4">
+      <div className="relative mb-3">
         <div className="flex items-center rounded-md border border-[#ddd4c4] bg-white px-3 py-2.5 shadow-sm">
           <span className="mr-2 text-neutral-400">⌕</span>
 
@@ -1098,7 +1098,7 @@ export default function OrderPage() {
       </div>
 
       {parcelInfo ? (
-        <div className="mb-5 border-b border-[#ddd4c4] pb-5">
+        <div className="mb-4">
           <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-[#2f8f56]">
             <span>●</span>
             {parcelInfo.isDemo ? "Beispiel-Analyse" : "Grundstück gefunden"}
@@ -1200,8 +1200,14 @@ export default function OrderPage() {
         <div className="mb-3 text-xs leading-snug text-[#777]">{message}</div>
       )}
 
-      <div className="mb-3">
-        <h2 className="mb-2 text-base font-bold">Deine Daten</h2>
+      <div className="border-t border-[#e7decd] pt-4">
+        <div className="mb-1 flex items-baseline justify-between">
+          <h2 className="text-base font-bold">Bestellung</h2>
+          <div className="text-xl font-bold">CHF 49.–</div>
+        </div>
+        <div className="mb-3 text-xs text-[#6f6450]">
+          Baupotential auf der Karte · PDF-Bericht in 24 Std. per E-Mail
+        </div>
 
         <label className="mb-0.5 block text-xs font-medium">Name</label>
         <input
@@ -1219,15 +1225,6 @@ export default function OrderPage() {
           type="email"
           className="w-full rounded-md border border-[#ddd4c4] bg-white px-3 py-2 text-sm outline-none focus:border-[#b6843b]"
         />
-      </div>
-
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-2xl font-bold">CHF 49.–</div>
-
-        <div className="text-xs text-[#555]">
-          <div>📍 Baupotential auf Karte dargestellt</div>
-          <div>📄 PDF innerhalb 24 Std. per E-Mail</div>
-        </div>
       </div>
 
      

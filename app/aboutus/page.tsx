@@ -141,30 +141,19 @@ export default function AboutUsPage() {
         <div className="border-t border-[#e4d8c7] pt-5">
           <h2 className="mb-4 text-lg font-bold">Wer steckt hinter Lota?</h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="mb-2 h-28 rounded-xl bg-[#ddd4c8]" />
-              <h3 className="text-sm font-bold">Max Mustermann</h3>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
-                Mitgründer von Lota. Max bringt Erfahrung in Geodaten,
-                Raumplanung und Softwareentwicklung mit.
-              </p>
-            </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/team/gruender.png"
+            alt="Die Gründer von Lota: Yves Stauber und David Gerber"
+            className="mb-3 w-full rounded-xl"
+          />
 
-            <div>
-              <div className="mb-2 h-28 rounded-xl bg-[#ddd4c8]" />
-              <h3 className="text-sm font-bold">Lukas Beispiel</h3>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
-                Mitgründer von Lota. Lukas kennt den Immobilien- und
-                Bausektor und arbeitet an klaren, verständlichen Analysen.
-              </p>
-            </div>
-          </div>
-
-          <p className="mt-5 text-xs leading-relaxed text-[#52606b]">
-            Gemeinsam entwickeln wir Lota mit dem Ziel, Grundstücksinformationen
-            verständlicher zugänglich zu machen und erste Einschätzungen zum
-            Baupotential einfacher bereitzustellen.
+          <h3 className="text-sm font-bold">Yves Stauber &amp; David Gerber</h3>
+          <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+            Wir sind die beiden Gründer von Lota. Wir verbinden Geodaten,
+            Raumplanung und Softwareentwicklung mit Wissen aus dem Immobilien-
+            und Bausektor — mit dem Ziel, das Baupotential jedes Grundstücks
+            verständlich und schnell zugänglich zu machen.
           </p>
         </div>
 
@@ -173,10 +162,10 @@ export default function AboutUsPage() {
           <p className="mt-1 text-xs text-[#52606b]">
             Schreib uns an{" "}
             <a
-              href="mailto:info@lota.ch"
+              href="mailto:info@lota-solutions.ch"
               className="font-medium text-[#a97937] hover:opacity-70"
             >
-              info@lota.ch
+              info@lota-solutions.ch
             </a>
           </p>
         </div>

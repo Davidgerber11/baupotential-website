@@ -1015,7 +1015,7 @@ export default function OrderPage() {
           jeder Schweizer Parzelle — als PDF-Bericht innerhalb von 24 Stunden.
         </p>
 
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
           {parcelInfo && (
             <button
               onClick={resetSelection}
@@ -1030,6 +1030,13 @@ export default function OrderPage() {
             className="inline-flex items-center gap-1.5 rounded-md bg-[#b6843b] px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#a3742f]"
           >
             📄 Beispiel-Bericht ansehen
+          </Link>
+
+          <Link
+            href="/aboutus"
+            className="text-sm font-semibold text-[#b6843b] hover:opacity-70"
+          >
+            Über uns →
           </Link>
         </div>
       </div>

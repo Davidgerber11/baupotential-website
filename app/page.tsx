@@ -9,7 +9,7 @@ import demoBuildable from "@/lib/demo-buildable.json";
 import demoBuildings from "@/lib/demo-buildings.json";
 import demoEdges from "@/lib/demo-edges.json";
 import demoDims from "@/lib/demo-dims.json";
-import { loadMapView, saveMapView } from "@/lib/mapView";
+import { saveMapView } from "@/lib/mapView";
 
 const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -39,8 +39,11 @@ type ParcelInfo = {
 // Vorzeige-Parzelle fuer den Startbildschirm: echte Engine-Werte (Muri bei Bern 601,
 // Brunnenweg 5). Zeigt dem Nutzer beim Laden sofort, was das Produkt liefert.
 const DEMO = {
-  lon: 7.485372,
-  lat: 46.930161,
+  // Zentrum aufs Parzellen-Cluster (601 + Nachbarn) + naeherer Zoom, damit
+  // die eingezeichneten Grenzabstaende/Baufelder gross sichtbar sind.
+  lon: 7.4857,
+  lat: 46.9302,
+  zoom: 18.3,
   label: "Brunnenweg 5, Muri bei Bern",
   parcelArea: 944,
   potential: {
@@ -74,16 +77,24 @@ export default function OrderPage() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const view = loadMapView({ center: [7.4474, 46.9481], zoom: 15.5 });
+    // Beim Laden direkt bei den Demo-Parzellen starten (kein Bern-Altstadt-Flash).
+    // Bei ?lon=&lat= (Link aus Suche) startet die Karte dort.
+    const initParams = new URLSearchParams(window.location.search);
+    const initLon = Number(initParams.get("lon"));
+    const initLat = Number(initParams.get("lat"));
+    const hasInitParam =
+      initParams.get("lon") !== null &&
+      initParams.get("lat") !== null &&
+      !Number.isNaN(initLon) &&
+      !Number.isNaN(initLat);
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       // Mapbox Satellite (Google-Earth-Stil): durchgehende Luftbild-Basis ueber
-      // alle Zoomstufen -> EINE konsistente Karte. Die Kataster-Grenzen werden
-      // per raster-color transparent drueber gelegt (weiss -> durchsichtig).
+      // alle Zoomstufen. Kataster-Grenzen per raster-color transparent drueber.
       style: "mapbox://styles/mapbox/satellite-streets-v12",
-      center: view.center,
-      zoom: view.zoom,
+      center: hasInitParam ? [initLon, initLat] : [DEMO.lon, DEMO.lat],
+      zoom: hasInitParam ? 18 : DEMO.zoom,
       minZoom: 8,
       maxZoom: 20,
       dragRotate: false,
@@ -91,6 +102,16 @@ export default function OrderPage() {
     });
 
     mapRef.current = map;
+
+    // Info-Panel (links) freihalten: Demo-Cluster sofort rechts daneben rahmen
+    // (vor dem ersten Frame -> kein sichtbares Nachspringen).
+    if (!hasInitParam) {
+      map.jumpTo({
+        center: [DEMO.lon, DEMO.lat],
+        zoom: DEMO.zoom,
+        padding: { left: 400, top: 0, right: 0, bottom: 0 },
+      });
+    }
 
     // Reine 2D-Kataster-Ansicht: keine Rotation/Neigung noetig.
     map.touchZoomRotate.disableRotation();
@@ -321,27 +342,17 @@ export default function OrderPage() {
         const parsedLat = Number(lat);
 
         if (!Number.isNaN(parsedLon) && !Number.isNaN(parsedLat)) {
-          map.jumpTo({
-            center: [parsedLon, parsedLat],
-            zoom: 18,
-          });
-
+          // Kamera steht bereits (Konstruktor). Nur noch die Parzelle ermitteln.
           setTimeout(async () => {
             await identifyParcel(parsedLon, parsedLat);
             window.history.replaceState({}, "", "/");
           }, 500);
         }
       } else {
-        // Startbildschirm: Beispiel-Parzellen direkt auf der Karte analysiert
-        // zeigen (oranges Baufeld + Masspfeile) -> die Karte spricht fuer sich.
-        // Das Panel bleibt im Normalzustand (Suche), daher KEIN identifyParcel.
-        // padding.left haelt das Info-Panel (links, ~460px) frei.
-        map.jumpTo({
-          center: [DEMO.lon, DEMO.lat],
-          zoom: 17.5,
-          padding: { left: 460, top: 0, right: 0, bottom: 0 },
-        });
-        setTimeout(() => drawDemoPotential(), 400);
+        // Startbildschirm: Demo-Overlay (oranges Baufeld + Masspfeile) zeichnen.
+        // Kamera ist schon beim Parzellen-Cluster (Konstruktor) -> kein Sprung,
+        // kein Bern-Altstadt-Flash. Panel bleibt im Normalzustand (Suche).
+        drawDemoPotential();
       }
     });
 

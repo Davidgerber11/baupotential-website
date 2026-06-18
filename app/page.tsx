@@ -149,7 +149,7 @@ export default function OrderPage() {
         // sichtbaren oberen Bereich rahmen (padding unten).
         zoom: wide ? DEMO.zoom : 17.4,
         padding: wide
-          ? { left: 400, top: 0, right: 0, bottom: 0 }
+          ? { left: 460, top: 0, right: 0, bottom: 0 }
           : {
               left: 16,
               right: 16,
@@ -941,7 +941,7 @@ export default function OrderPage() {
         // Handy: padding unten = Sheet-Maxhoehe (68dvh), damit die Parzelle auch
         // dann ueber dem Sheet bleibt, wenn es nach der Auswahl auf Maxhoehe waechst.
         padding: wide
-          ? { left: 480, top: 90, right: 90, bottom: 90 }
+          ? { left: 500, top: 90, right: 90, bottom: 90 }
           : { top: 60, left: 24, right: 24, bottom: Math.round(mapH * 0.68) },
         maxZoom: 18,
         duration: 700,
@@ -1055,14 +1055,14 @@ export default function OrderPage() {
   <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute inset-x-0 bottom-0 z-10 flex max-h-[68dvh] flex-col overflow-hidden rounded-t-2xl bg-[#faf7f0]/97 p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:inset-x-auto md:bottom-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[380px] md:rounded-xl md:p-5 md:shadow-xl">
+    <aside className="absolute inset-x-0 bottom-0 z-10 flex max-h-[68dvh] flex-col overflow-hidden rounded-t-2xl bg-[#faf7f0]/97 p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:inset-x-auto md:bottom-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[440px] md:rounded-xl md:p-5 md:shadow-xl">
       {/* Greifer-Bar: signalisiert auf dem Handy das Bottom-Sheet */}
       <div className="mx-auto mb-2 h-1 w-10 shrink-0 rounded-full bg-[#d8cfbe] md:hidden" />
       {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
       <div className="shrink-0">
         <div className="flex items-center gap-3">
           <div className="text-3xl text-[#b6843b]">⌂</div>
-          <div className="text-2xl font-bold">Lota</div>
+          <div className="text-3xl font-bold">Lota</div>
         </div>
 
         <p className="mt-2 text-sm font-medium leading-snug text-[#2b2f2a]">
@@ -1163,7 +1163,7 @@ export default function OrderPage() {
             {parcelInfo.isDemo ? "Beispiel-Analyse" : "Grundstück gefunden"}
           </div>
 
-          <h1 className="text-2xl font-bold leading-tight">
+          <h1 className="text-xl font-bold leading-tight">
             {query ||
               (parcelInfo.isDemo ? DEMO.label : `Parzelle ${parcelInfo.number}`)}
           </h1>
@@ -1248,7 +1248,7 @@ export default function OrderPage() {
           </div>
 
           {parcelInfo.isDemo && (
-            <div className="mt-3 rounded-md bg-[#1d2731] px-3 py-2 text-xs leading-relaxed text-white">
+            <div className="mt-3 rounded-md bg-[#1d2731] px-3 py-2 text-sm leading-relaxed text-white">
               👉 Wir kennen das Baupotential{" "}
               <strong>jedes</strong> Grundstücks — die orange Fläche zeigt das
               bebaubare Baufeld. Suchen Sie oben Ihr eigenes Grundstück.
@@ -1256,7 +1256,7 @@ export default function OrderPage() {
           )}
         </div>
       ) : (
-        <div className="mb-3 text-xs leading-snug text-[#777]">{message}</div>
+        <div className="mb-3 text-sm leading-snug text-[#777]">{message}</div>
       )}
 
       <div className="border-t border-[#e7decd] pt-4">

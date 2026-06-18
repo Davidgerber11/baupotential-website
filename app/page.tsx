@@ -1065,12 +1065,11 @@ export default function OrderPage() {
           <div className="text-2xl font-bold">Lota</div>
         </div>
 
-        <p className="mt-2 text-sm leading-snug text-[#4b4f48]">
-          Herausfinden, wie viel du auf deinem{" "}
-          <strong className="font-semibold text-[#2b2f2a]">
-            Grundstück bauen
-          </strong>{" "}
-          kannst — als PDF-Bericht in 24 Stunden.
+        <p className="mt-2 text-sm font-medium leading-snug text-[#2b2f2a]">
+          Finde heraus, wie viel du auf deinem Grundstück bauen darfst!
+        </p>
+        <p className="mt-1 text-xs text-[#8a7e66]">
+          Dein Baupotential als PDF-Bericht in 24 Stunden.
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

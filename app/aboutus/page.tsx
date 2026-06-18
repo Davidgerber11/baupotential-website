@@ -135,7 +135,7 @@ export default function AboutUsPage() {
 
         <h1 className="mb-5 text-4xl font-bold tracking-tight">Über uns</h1>
 
-        <p className="mb-5 text-base leading-relaxed text-[#42505c]">
+        <p className="mb-5 text-sm leading-relaxed text-[#42505c]">
           Lota hilft dir, das Potenzial eines Grundstücks schnell und einfach
           einzuschätzen. Nach Eingabe einer Adresse oder Parzelle erstellen wir
           eine Baupotentialanalyse auf Basis öffentlich zugänglicher Daten,

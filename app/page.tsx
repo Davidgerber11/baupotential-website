@@ -1066,11 +1066,11 @@ export default function OrderPage() {
         </div>
 
         <p className="mt-2 text-sm leading-snug text-[#4b4f48]">
-          Lota berechnet die{" "}
+          Herausfinden, wie viel du auf deinem{" "}
           <strong className="font-semibold text-[#2b2f2a]">
-            bebaubare Grundfläche
+            Grundstück bauen
           </strong>{" "}
-          jeder Schweizer Parzelle — als PDF-Bericht in 24 Stunden.
+          kannst — als PDF-Bericht in 24 Stunden.
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">

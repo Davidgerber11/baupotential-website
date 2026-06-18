@@ -113,7 +113,7 @@ export default function AboutUsPage() {
 
       <div className="absolute inset-0 bg-[#f4eadc]/20 pointer-events-none" />
 
-      <aside className="absolute inset-x-3 top-3 z-10 flex max-h-[calc(100dvh-24px)] flex-col overflow-y-auto rounded-[18px] bg-[#fbf7ef]/95 p-5 shadow-2xl backdrop-blur-md md:inset-x-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[420px] md:p-7">
+      <aside className="absolute inset-x-3 top-3 z-10 flex max-h-[calc(100dvh-24px)] flex-col overflow-y-auto rounded-[18px] bg-[#fbf7ef]/95 p-5 shadow-2xl backdrop-blur-md md:inset-x-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[500px] md:p-7">
         <Link href="/" className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#c79b5a] text-[#b17a2e]">
             ⌂
@@ -135,7 +135,7 @@ export default function AboutUsPage() {
 
         <h1 className="mb-5 text-4xl font-bold tracking-tight">Über uns</h1>
 
-        <p className="mb-5 text-sm leading-relaxed text-[#42505c]">
+        <p className="mb-5 text-base leading-relaxed text-[#42505c]">
           Lota hilft dir, das Potenzial eines Grundstücks schnell und einfach
           einzuschätzen. Nach Eingabe einer Adresse oder Parzelle erstellen wir
           eine Baupotentialanalyse auf Basis öffentlich zugänglicher Daten,
@@ -148,10 +148,10 @@ export default function AboutUsPage() {
               ✉
             </div>
             <div>
-              <h2 className="text-sm font-bold">
+              <h2 className="text-base font-bold">
                 Analyse innerhalb von 24 Stunden per E-Mail
               </h2>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+              <p className="mt-1 text-sm leading-relaxed text-[#52606b]">
                 Nach erfolgreicher Bezahlung wird die Analyse innerhalb von 24
                 Stunden an deine E-Mail-Adresse zugestellt.
               </p>
@@ -165,10 +165,10 @@ export default function AboutUsPage() {
               ⚠
             </div>
             <div>
-              <h2 className="text-sm font-bold">
+              <h2 className="text-base font-bold">
                 Wir befinden uns in der Testphase
               </h2>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+              <p className="mt-1 text-sm leading-relaxed text-[#52606b]">
                 Lota befindet sich aktuell in einer Testphase. Wir verbessern
                 unsere Analysen laufend und prüfen jede Bestellung sorgfältig,
                 bevor sie versendet wird.
@@ -178,7 +178,7 @@ export default function AboutUsPage() {
         </div>
 
         <div className="border-t border-[#e4d8c7] pt-5">
-          <h2 className="mb-4 text-lg font-bold">Wer steckt hinter Lota?</h2>
+          <h2 className="mb-4 text-xl font-bold">Wer steckt hinter Lota?</h2>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -187,18 +187,18 @@ export default function AboutUsPage() {
             className="mb-3 w-full rounded-xl"
           />
 
-          <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+          <p className="mt-1 text-sm leading-relaxed text-[#52606b]">
             Wir sind zwei Studenten der ETH Zürich und beide im Raum Bern
             aufgewachsen.
           </p>
 
           <div className="mt-4 space-y-3">
             <div>
-              <h3 className="text-sm font-bold">
+              <h3 className="text-base font-bold">
                 Yves Stauber{" "}
                 <span className="font-medium text-[#a97937]">(rechts)</span>
               </h3>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+              <p className="mt-1 text-sm leading-relaxed text-[#52606b]">
                 Studiert Bauingenieurwissenschaften an der ETH Zürich. Bereits
                 während des Gymnasiums hat er sich aktiv mit Immobilienentwicklung
                 auseinandergesetzt und danach ein Jahr bei einem Totalunternehmen
@@ -207,18 +207,18 @@ export default function AboutUsPage() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold">
+              <h3 className="text-base font-bold">
                 David Gerber{" "}
                 <span className="font-medium text-[#a97937]">(links)</span>
               </h3>
-              <p className="mt-1 text-xs leading-relaxed text-[#52606b]">
+              <p className="mt-1 text-sm leading-relaxed text-[#52606b]">
                 Studiert Erd- und Klimawissenschaften an der ETH Zürich. Er
                 bringt eine grosse Affinität für Technologie mit.
               </p>
             </div>
           </div>
 
-          <p className="mt-4 text-xs leading-relaxed text-[#52606b]">
+          <p className="mt-4 text-sm leading-relaxed text-[#52606b]">
             Gemeinsam verbinden wir Wissen aus Immobilienentwicklung und
             Technologie, um das Baupotential jedes Grundstücks verständlich und
             schnell zugänglich zu machen.
@@ -234,14 +234,14 @@ export default function AboutUsPage() {
             <img
               src="/logos/eth-sph.png"
               alt="ETH Student Project House"
-              className="w-40"
+              className="w-44"
             />
           </div>
         </div>
 
         <div className="mt-6 border-t border-[#e4d8c7] pt-5">
-          <h2 className="text-sm font-bold">Hast du Fragen?</h2>
-          <p className="mt-1 text-xs text-[#52606b]">
+          <h2 className="text-base font-bold">Hast du Fragen?</h2>
+          <p className="mt-1 text-sm text-[#52606b]">
             Schreib uns an{" "}
             <a
               href="mailto:info@lota-solutions.ch"

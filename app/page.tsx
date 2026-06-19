@@ -57,6 +57,12 @@ const DEMO = {
 // Rastpunkte (dvh) für das mobile Bottom-Sheet, das per Greifer gezogen wird.
 const SHEET_SNAPS = [42, 68, 92];
 
+// cal.com 10-Min-Gespräch (EU-Instanz app.cal.eu). CAL_LINK = "<user>/<event-slug>";
+// bei Änderung des Event-Typs nur hier anpassen.
+const CAL_ORIGIN = "https://app.cal.eu";
+const CAL_LINK = "lota-solutions/gespraech";
+const CAL_NS = "gespraech";
+
 export default function OrderPage() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -118,6 +124,50 @@ export default function OrderPage() {
       ctrl.abort();
     };
   }, [query]);
+
+  // cal.com-Buchungs-Embed (EU-Instanz) einmalig laden. Popup wird per data-cal-*
+  // am "Termin buchen"-Button ausgelöst; Prefill via dessen data-cal-config.
+  useEffect(() => {
+    const w = window as any;
+    (function (C: any, A: string, L: string) {
+      const p = (a: any, ar: any) => {
+        a.q.push(ar);
+      };
+      const d = C.document;
+      C.Cal =
+        C.Cal ||
+        function () {
+          const cal = C.Cal;
+          const ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api: any = function () {
+              p(api, arguments);
+            };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else p(cal, ar);
+            return;
+          }
+          p(cal, ar);
+        };
+    })(w, `${CAL_ORIGIN}/embed/embed.js`, "init");
+    w.Cal("init", CAL_NS, { origin: CAL_ORIGIN });
+    w.Cal.ns[CAL_NS]("ui", {
+      hideEventTypeDetails: false,
+      layout: "month_view",
+      theme: "light",
+    });
+  }, []);
 
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
@@ -1402,6 +1452,45 @@ export default function OrderPage() {
 
       <div className="mt-2.5 text-center text-xs text-[#777]">
         🔒 Sichere Zahlung über Stripe
+      </div>
+
+      <div className="mt-4 rounded-lg border border-[#e7decd] bg-[#f1ead9] p-3">
+        <div className="flex items-start gap-2.5">
+          <span className="text-base leading-none">📞</span>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-[#2b2f2a]">
+              Inklusive: gratis 10-Minuten-Gespräch
+            </div>
+            <p className="mt-0.5 text-xs leading-snug text-[#6f6450]">
+              Wir besprechen die Resultate deiner Analyse — unverbindlich.
+            </p>
+            <button
+              type="button"
+              data-cal-namespace={CAL_NS}
+              data-cal-link={CAL_LINK}
+              data-cal-origin={CAL_ORIGIN}
+              data-cal-config={JSON.stringify({
+                layout: "month_view",
+                theme: "light",
+                ...(customerName.trim() ? { name: customerName.trim() } : {}),
+                ...(customerEmail.trim() ? { email: customerEmail.trim() } : {}),
+                ...(parcelInfo
+                  ? {
+                      notes:
+                        `Parzelle ${parcelInfo.number}` +
+                        (parcelInfo.municipality &&
+                        parcelInfo.municipality !== "—"
+                          ? `, ${parcelInfo.municipality}`
+                          : ""),
+                    }
+                  : {}),
+              })}
+              className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-[#b6843b] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#a3742f]"
+            >
+              📅 Termin buchen →
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-wrap justify-center gap-x-3 gap-y-1 border-t border-[#ddd4c4] pt-3 text-xs text-[#555]">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import Link from "next/link";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -53,6 +54,9 @@ const DEMO = {
   } as Potential,
 };
 
+// Rastpunkte (dvh) für das mobile Bottom-Sheet, das per Greifer gezogen wird.
+const SHEET_SNAPS = [42, 68, 92];
+
 export default function OrderPage() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -76,6 +80,12 @@ export default function OrderPage() {
   );
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
+
+  // Mobiles Bottom-Sheet: Höhe per Greifer ziehen. Die Höhe steckt in der
+  // CSS-Variable --sheet-h; der Desktop überschreibt sie mit md:h-auto.
+  const [sheetH, setSheetH] = useState(68);
+  const [sheetDragging, setSheetDragging] = useState(false);
+  const sheetDragRef = useRef<{ startY: number; startH: number } | null>(null);
 
   // Live-Vorschläge schon beim Tippen (entprellt). Laufende Anfragen werden
   // abgebrochen; nach Auswahl eines Treffers wird einmal übersprungen.
@@ -1051,13 +1061,64 @@ export default function OrderPage() {
     setMessage("Adresse oder Parzelle suchen oder direkt auf die Karte klicken.");
   }
 
+  // Greifer gedrückt: Drag starten. Move/Up hängen global an window (Effekt
+  // unten), damit der Finger auch ausserhalb des Greifers erfasst wird.
+  function onSheetPointerDown(e: ReactPointerEvent) {
+    sheetDragRef.current = { startY: e.clientY, startH: sheetH };
+    setSheetDragging(true);
+  }
+
+  useEffect(() => {
+    if (!sheetDragging) return;
+    const onMove = (e: PointerEvent) => {
+      const d = sheetDragRef.current;
+      if (!d) return;
+      const deltaVh = ((d.startY - e.clientY) / window.innerHeight) * 100;
+      const next = Math.min(
+        SHEET_SNAPS[SHEET_SNAPS.length - 1],
+        Math.max(SHEET_SNAPS[0], d.startH + deltaVh),
+      );
+      setSheetH(next);
+    };
+    const onUp = () => {
+      sheetDragRef.current = null;
+      setSheetDragging(false);
+      setSheetH((cur) =>
+        SHEET_SNAPS.reduce((a, b) => (Math.abs(b - cur) < Math.abs(a - cur) ? b : a)),
+      );
+    };
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+    };
+  }, [sheetDragging]);
+
   return (
   <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 
-    <aside className="absolute inset-x-0 bottom-0 z-10 flex max-h-[68dvh] flex-col overflow-hidden rounded-t-2xl bg-[#faf7f0]/97 p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:inset-x-auto md:bottom-auto md:left-6 md:top-6 md:max-h-[calc(100vh-48px)] md:w-[440px] md:rounded-xl md:p-5 md:shadow-xl">
-      {/* Greifer-Bar: signalisiert auf dem Handy das Bottom-Sheet */}
-      <div className="mx-auto mb-2 h-1 w-10 shrink-0 rounded-full bg-[#d8cfbe] md:hidden" />
+    <aside
+      style={
+        {
+          "--sheet-h": `${sheetH}dvh`,
+          transition: sheetDragging
+            ? "none"
+            : "height 0.28s cubic-bezier(0.4, 0, 0.2, 1)",
+        } as CSSProperties
+      }
+      className="absolute inset-x-0 bottom-0 z-10 flex h-[var(--sheet-h)] flex-col overflow-hidden rounded-t-2xl bg-[#faf7f0]/97 p-4 shadow-[0_-8px_24px_rgba(0,0,0,0.18)] backdrop-blur md:inset-x-auto md:bottom-auto md:left-6 md:top-6 md:h-auto md:max-h-[calc(100vh-48px)] md:w-[440px] md:rounded-xl md:p-5 md:shadow-xl"
+    >
+      {/* Greifer: Bottom-Sheet hoch-/runterziehen (nur Handy) */}
+      <div
+        onPointerDown={onSheetPointerDown}
+        className="mx-auto -mt-1 mb-1 flex w-full shrink-0 cursor-grab touch-none justify-center py-2 active:cursor-grabbing md:hidden"
+      >
+        <div className="h-1.5 w-11 rounded-full bg-[#d8cfbe]" />
+      </div>
       {/* Kopf bleibt immer sichtbar: Marke + was Lota macht + Beispiel-Button */}
       <div className="shrink-0">
         <div className="flex items-center gap-3">

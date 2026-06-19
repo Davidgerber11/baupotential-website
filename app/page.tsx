@@ -1459,10 +1459,11 @@ export default function OrderPage() {
           <span className="text-base leading-none">📞</span>
           <div className="min-w-0">
             <div className="text-sm font-semibold text-[#2b2f2a]">
-              Inklusive: gratis 10-Minuten-Gespräch
+              Gratis 10-Minuten-Gespräch
             </div>
             <p className="mt-0.5 text-xs leading-snug text-[#6f6450]">
-              Wir besprechen die Resultate deiner Analyse — unverbindlich.
+              Fragen zu deinem Grundstück oder Baupotential? Wir beraten dich
+              kostenlos und unverbindlich — auch vor einer Bestellung.
             </p>
             <button
               type="button"

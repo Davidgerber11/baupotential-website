@@ -31,12 +31,12 @@ export async function POST(req: Request) {
             currency: "chf",
 
             product_data: {
-              name: "Baupotenzialanalyse",
+              name: "Baupotentialanalyse",
               description: `Parzelle ${parcel_number}, ${municipality}`,
             },
 
-            // CHF 99.00
-            unit_amount: 9900,
+            // CHF 49.00
+            unit_amount: 4900,
           },
         },
       ],
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
       },
 
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?order=${order_id}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/order`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/`,
     });
 
     return NextResponse.json({

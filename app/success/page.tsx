@@ -1,8 +1,10 @@
 import Link from "next/link";
+import ConversionTracker from "./ConversionTracker";
 
 export default function SuccessPage() {
   return (
     <main className="relative flex min-h-screen w-screen items-center justify-center bg-[#f5f1e8] px-6 py-12 text-[#1d2731]">
+      <ConversionTracker />
       <section className="w-full max-w-[480px] rounded-[18px] bg-[#fbf7ef] p-8 shadow-2xl">
         <Link href="/" className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#c79b5a] text-[#b17a2e]">

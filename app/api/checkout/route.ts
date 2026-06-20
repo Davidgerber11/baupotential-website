@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         municipality: String(municipality),
       },
 
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?order=${order_id}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/order`,
     });
 

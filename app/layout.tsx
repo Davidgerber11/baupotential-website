@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +12,10 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Google-Ads-Tag (Conversion-Tracking). Lädt nur, wenn die Conversion-ID als
+// Env-Var gesetzt ist (NEXT_PUBLIC_GOOGLE_ADS_ID, Format "AW-XXXXXXXXX").
+const GADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 const TITLE = "Lota — Baupotential jeder Schweizer Parzelle";
 const DESCRIPTION =
@@ -70,7 +75,20 @@ export default function RootLayout({
       lang="de"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {GADS_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GADS_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-ads-gtag" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GADS_ID}');`}
+            </Script>
+          </>
+        )}
+        {children}
+      </body>
     </html>
   );
 }

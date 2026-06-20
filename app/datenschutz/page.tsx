@@ -101,7 +101,7 @@ export default function DatenschutzPage() {
 
         <h1 className="mb-2 text-4xl font-bold tracking-tight">Datenschutz</h1>
         <p className="mb-4 text-xs font-medium text-[#a97937]">
-          Stand: 20. Juni 2026
+          Stand: 21. Juni 2026
         </p>
 
         <p className="mb-6 text-sm leading-relaxed text-[#42505c]">
@@ -311,9 +311,11 @@ export default function DatenschutzPage() {
               Lota verwendet derzeit nur technisch notwendige Cookies oder
               vergleichbare Technologien, soweit diese für den Betrieb der
               Webseite, die Zahlungsabwicklung, die Sicherheit oder die
-              Bereitstellung einzelner Funktionen erforderlich sind. Aktuell
-              verwenden wir keine Analyse-Tools wie Google Analytics und kein
-              Tracking für personalisierte Werbung. Beim Besuch der Webseite
+              Bereitstellung einzelner Funktionen erforderlich sind. Für die
+              Erfolgsmessung unserer Google-Ads-Werbung setzen wir zusätzlich
+              Conversion-Cookies von Google ein (siehe Ziffer 12). Analyse-Tools
+              wie Google Analytics und Tracking für personalisierte Werbung
+              verwenden wir nicht. Beim Besuch der Webseite
               können aus technischen Gründen gewisse Daten automatisch
               verarbeitet werden, zum Beispiel IP-Adresse, Datum und Uhrzeit des
               Zugriffs, aufgerufene Seiten, Browsertyp, Betriebssystem,
@@ -324,16 +326,22 @@ export default function DatenschutzPage() {
 
           <section>
             <h2 className="mb-1 font-bold text-[#1d2731]">
-              12. Werbung und zukünftiges Tracking
+              12. Werbung und Conversion-Tracking
             </h2>
             <p>
-              Aktuell erstellen wir keine Nutzerprofile und verwenden keine
-              personenbezogene Werbung oder Retargeting-Technologien. Falls wir
-              in Zukunft Werbung, Tracking, Analyse-Tools, Retargeting oder
-              Marketing-Pixel einsetzen, wird diese Datenschutzerklärung
-              angepasst. Soweit gesetzlich erforderlich, wird vorher eine
-              Einwilligung eingeholt oder eine entsprechende Ablehnungsmöglichkeit
-              bereitgestellt.
+              Wir nutzen Google Ads Conversion-Tracking, um die Wirksamkeit
+              unserer Werbeanzeigen zu messen. Gelangen Sie über eine unserer
+              Google-Anzeigen auf die Webseite und schliessen anschliessend eine
+              Bestellung ab, wird über ein Cookie von Google erfasst, dass die
+              Bestellung auf eine Anzeige zurückgeht. Dabei können Daten wie eine
+              Klick-Kennung, Zeitpunkt und Bestellwert an Google (Google Ireland
+              Limited bzw. Google LLC, USA) übermittelt werden. Wir erhalten
+              dadurch nur aggregierte Statistiken und keine Daten, die Sie
+              persönlich identifizieren. Einzelheiten finden Sie in der
+              Datenschutzerklärung von Google. Darüber hinaus erstellen wir keine
+              Nutzerprofile und betreiben kein Retargeting. Falls wir künftig
+              weitere Tracking- oder Analyse-Tools einsetzen, passen wir diese
+              Erklärung an und holen, soweit erforderlich, eine Einwilligung ein.
             </p>
           </section>
 

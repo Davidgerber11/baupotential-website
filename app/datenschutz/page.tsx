@@ -101,7 +101,7 @@ export default function DatenschutzPage() {
 
         <h1 className="mb-2 text-4xl font-bold tracking-tight">Datenschutz</h1>
         <p className="mb-4 text-xs font-medium text-[#a97937]">
-          Stand: 19. Mai 2026
+          Stand: 20. Juni 2026
         </p>
 
         <p className="mb-6 text-sm leading-relaxed text-[#42505c]">
@@ -254,12 +254,19 @@ export default function DatenschutzPage() {
               die Zustellung des Produkts oder aus rechtlichen Gründen
               erforderlich oder zweckmässig ist. Mögliche Empfänger sind
               insbesondere Hosting-Anbieter (voraussichtlich AWS oder Google
-              Cloud), Zahlungsdienstleister (insbesondere Stripe),
-              E-Mail-Dienstleister, Karten- und Geodatenanbieter (insbesondere
+              Cloud), Zahlungsdienstleister (insbesondere Stripe), der
+              Terminbuchungs-Dienst Cal.com, E-Mail-Dienstleister, Karten- und Geodatenanbieter (insbesondere
               Mapbox), Cloud-Speicher oder interne Ablagesysteme, technische
               Dienstleister sowie Behörden, Gerichte oder Rechtsberater, falls
-              dies rechtlich erforderlich ist. Eine Weitergabe von
-              Kundenanfragen an Architekten, Makler, Investoren, Bauunternehmen
+              dies rechtlich erforderlich ist. Wenn Nutzerinnen und Nutzer über
+              die Webseite ein kostenloses Beratungsgespräch buchen, werden die
+              dafür eingegebenen Daten (Name, E-Mail-Adresse, angegebene
+              Grundstückadresse sowie allfällige Notizen) durch den
+              Terminbuchungs-Dienst Cal.com (Cal.com, Inc.) bearbeitet. Wir
+              nutzen die EU-Instanz von Cal.com (app.cal.eu); die Buchungsdaten
+              werden auf Servern in der EU bearbeitet. Cal.com informiert in der
+              eigenen Datenschutzerklärung über die Bearbeitung. Eine Weitergabe
+              von Kundenanfragen an Architekten, Makler, Investoren, Bauunternehmen
               oder andere externe Partner findet aktuell nicht statt.
             </p>
           </section>

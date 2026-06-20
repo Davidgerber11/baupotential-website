@@ -1147,6 +1147,18 @@ export default function OrderPage() {
     };
   }, [sheetDragging]);
 
+  // Fürs Gespräch: bereits eingegebene Adresse bzw. gewählte Parzelle ins
+  // (Pflicht-)Feld "Adresse des Grundstücks" des cal.com-Formulars vorausfüllen.
+  const consultProperty =
+    query.trim() ||
+    (parcelInfo
+      ? `Parzelle ${parcelInfo.number}${
+          parcelInfo.municipality && parcelInfo.municipality !== "—"
+            ? `, ${parcelInfo.municipality}`
+            : ""
+        }`
+      : "");
+
   return (
   <main className="relative h-[100dvh] w-screen overflow-hidden bg-[#f4efe5] text-[#2b2f2a]">
     <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
@@ -1473,6 +1485,9 @@ export default function OrderPage() {
               data-cal-config={JSON.stringify({
                 layout: "month_view",
                 theme: "light",
+                ...(consultProperty
+                  ? { "Adresse-des-Grundst-cks": consultProperty }
+                  : {}),
                 ...(customerName.trim() ? { name: customerName.trim() } : {}),
                 ...(customerEmail.trim() ? { email: customerEmail.trim() } : {}),
                 ...(parcelInfo

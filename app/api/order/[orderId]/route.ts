@@ -8,9 +8,9 @@ const supabase = createClient(
 
 export async function GET(
   _req: Request,
-  { params }: { params: { orderId: string } }
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
-  const orderId = params.orderId;
+  const { orderId } = await params;
 
   if (!orderId) {
     return NextResponse.json({ error: "Order ID fehlt." }, { status: 400 });

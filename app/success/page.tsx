@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import VerifiedSuccess from "./VerifiedSuccess";
 
@@ -17,7 +18,15 @@ export default function SuccessPage() {
           </div>
         </Link>
 
-        <VerifiedSuccess />
+        <Suspense
+          fallback={
+            <div className="mb-6 rounded-md border border-[#e4d8c7] bg-white/60 p-4 text-sm text-[#42505c]">
+              Lade Zahlungsinformationen…
+            </div>
+          }
+        >
+          <VerifiedSuccess />
+        </Suspense>
 
         <footer className="mt-7 flex flex-wrap justify-center gap-x-4 gap-y-2 border-t border-[#e4d8c7] pt-5 text-xs text-[#42505c]">
           <Link href="/aboutus" className="hover:text-[#a97937]">

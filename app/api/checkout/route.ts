@@ -19,8 +19,8 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      // TWINT + card
-      payment_method_types: ["card", "twint"],
+      // TEMP: TWINT pending Stripe approval — re-add "twint" once enabled in Dashboard
+      payment_method_types: ["card"],
 
       customer_email: email,
 

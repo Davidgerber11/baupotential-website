@@ -35,8 +35,8 @@ export async function POST(req: Request) {
               description: `Parzelle ${parcel_number}, ${municipality}`,
             },
 
-            // TEMP for live-mode smoke test — revert to 4900 (CHF 49.00) before going live
-            unit_amount: 100,
+            // CHF 49.00
+            unit_amount: 4900,
           },
         },
       ],

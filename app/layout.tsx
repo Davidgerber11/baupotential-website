@@ -13,9 +13,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Google-Ads-Tag (Conversion-Tracking). Lädt nur, wenn die Conversion-ID als
-// Env-Var gesetzt ist (NEXT_PUBLIC_GOOGLE_ADS_ID, Format "AW-XXXXXXXXX").
+// Google-Tag (gtag.js) für Google Ads Conversion-Tracking (NEXT_PUBLIC_GOOGLE_ADS_ID,
+// Format "AW-XXXXXXXXX") und/oder Google Analytics 4 (NEXT_PUBLIC_GA_ID, "G-XXXXXXXXXX").
+// gtag.js wird einmal geladen und konfiguriert beide Ziele, sofern gesetzt.
 const GADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GTAG_ID = GADS_ID || GA_ID;
+const GTAG_CONFIGS =
+  (GADS_ID ? `gtag('config','${GADS_ID}');` : "") +
+  (GA_ID ? `gtag('config','${GA_ID}');` : "");
 
 const TITLE = "Lota — Baupotential jeder Schweizer Parzelle";
 const DESCRIPTION =
@@ -76,14 +82,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {GADS_ID && (
+        {GTAG_ID && (
           <>
             <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GADS_ID}`}
+              src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
               strategy="afterInteractive"
             />
-            <Script id="google-ads-gtag" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GADS_ID}');`}
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${GTAG_CONFIGS}`}
             </Script>
           </>
         )}

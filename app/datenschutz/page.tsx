@@ -101,7 +101,7 @@ export default function DatenschutzPage() {
 
         <h1 className="mb-2 text-4xl font-bold tracking-tight">Datenschutz</h1>
         <p className="mb-4 text-xs font-medium text-[#a97937]">
-          Stand: 21. Juni 2026
+          Stand: 29. Juni 2026
         </p>
 
         <p className="mb-6 text-sm leading-relaxed text-[#42505c]">
@@ -312,10 +312,11 @@ export default function DatenschutzPage() {
               vergleichbare Technologien, soweit diese für den Betrieb der
               Webseite, die Zahlungsabwicklung, die Sicherheit oder die
               Bereitstellung einzelner Funktionen erforderlich sind. Für die
-              Erfolgsmessung unserer Google-Ads-Werbung setzen wir zusätzlich
-              Conversion-Cookies von Google ein (siehe Ziffer 12). Analyse-Tools
-              wie Google Analytics und Tracking für personalisierte Werbung
-              verwenden wir nicht. Beim Besuch der Webseite
+              Erfolgsmessung unserer Google-Ads-Werbung sowie für die
+              Reichweiten- und Nutzungsanalyse unserer Webseite setzen wir
+              zusätzlich Cookies von Google ein (Google Ads Conversion-Tracking
+              und Google Analytics 4, siehe Ziffer 12). Tracking für
+              personalisierte Werbung (Retargeting) verwenden wir nicht. Beim Besuch der Webseite
               können aus technischen Gründen gewisse Daten automatisch
               verarbeitet werden, zum Beispiel IP-Adresse, Datum und Uhrzeit des
               Zugriffs, aufgerufene Seiten, Browsertyp, Betriebssystem,
@@ -326,7 +327,7 @@ export default function DatenschutzPage() {
 
           <section>
             <h2 className="mb-1 font-bold text-[#1d2731]">
-              12. Werbung und Conversion-Tracking
+              12. Werbung, Conversion-Tracking und Webanalyse
             </h2>
             <p>
               Wir nutzen Google Ads Conversion-Tracking, um die Wirksamkeit
@@ -342,6 +343,21 @@ export default function DatenschutzPage() {
               Nutzerprofile und betreiben kein Retargeting. Falls wir künftig
               weitere Tracking- oder Analyse-Tools einsetzen, passen wir diese
               Erklärung an und holen, soweit erforderlich, eine Einwilligung ein.
+            </p>
+            <p className="mt-2">
+              Zur Analyse der Nutzung und Reichweite unserer Webseite verwenden
+              wir zudem Google Analytics 4 (GA4), einen Dienst der Google Ireland
+              Limited bzw. Google LLC (USA). GA4 setzt Cookies und erfasst
+              pseudonymisierte Nutzungsdaten wie aufgerufene Seiten,
+              Verweildauer, ungefähre Herkunft (Land/Region), Geräte- und
+              Browsertyp sowie die Quelle, über die Besucher auf die Webseite
+              gelangen (z. B. unsere Werbeanzeigen). Die IP-Adresse wird dabei
+              gekürzt bzw. nicht in den Berichten ausgewiesen. Wir werten diese
+              Daten ausschliesslich in aggregierter, nicht personenbezogener Form
+              aus, um die Webseite zu verbessern, und erstellen daraus keine
+              personenbezogenen Nutzerprofile. Einzelheiten finden Sie in der
+              Datenschutzerklärung von Google. Für Besucherinnen und Besucher aus
+              der EU holen wir, soweit erforderlich, vorab eine Einwilligung ein.
             </p>
           </section>
 

@@ -23,6 +23,14 @@ const GTAG_CONFIGS =
   (GADS_ID ? `gtag('config','${GADS_ID}');` : "") +
   (GA_ID ? `gtag('config','${GA_ID}');` : "");
 
+// Selbst-Ausschluss aus Google Analytics: Die Seite einmal mit "?ga_off=1"
+// aufrufen -> Flag in localStorage; ab dann ist GA4 für diesen Browser/dieses
+// Gerät deaktiviert (offizieller gtag-Schalter "ga-disable-<ID>"). "?ga_off=0"
+// hebt es wieder auf. Läuft vor den gtag('config')-Aufrufen.
+const GA_OPTOUT = GA_ID
+  ? `(function(){try{var p=new URLSearchParams(location.search);if(p.get('ga_off')==='1')localStorage.setItem('lota_ga_off','1');else if(p.get('ga_off')==='0')localStorage.removeItem('lota_ga_off');if(localStorage.getItem('lota_ga_off')==='1')window['ga-disable-${GA_ID}']=true;}catch(e){}})();`
+  : "";
+
 const TITLE = "Lota — Baupotential jeder Schweizer Parzelle";
 const DESCRIPTION =
   "Finde heraus, wie viel du auf deinem Grundstück bauen darfst. Lota erstellt eine Baupotentialanalyse jeder Schweizer Parzelle — als PDF-Bericht innerhalb von 24 Stunden.";
@@ -89,7 +97,7 @@ export default function RootLayout({
               strategy="afterInteractive"
             />
             <Script id="gtag-init" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${GTAG_CONFIGS}`}
+              {`${GA_OPTOUT}window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());${GTAG_CONFIGS}`}
             </Script>
           </>
         )}
